@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		5339C91821474E9100474D73 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C91721474E9100474D73 /* main.cpp */; };
+		5339C9252147BE0300474D73 /* memoryblock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C9232147BE0300474D73 /* memoryblock.cpp */; };
+		5339C9282147BE2400474D73 /* layer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C9262147BE2400474D73 /* layer.cpp */; };
+		5339C92B2147BE2900474D73 /* network.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C9292147BE2900474D73 /* network.cpp */; };
+		5339C92E21481D7600474D73 /* dataprocessing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C92C21481D7600474D73 /* dataprocessing.cpp */; };
+		5339C93321482DAD00474D73 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C93121482DAD00474D73 /* utility.cpp */; };
+		5339C9372148315600474D73 /* memorycell.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C9352148315600474D73 /* memorycell.cpp */; };
+		5339C93C214C38B500474D73 /* neuron.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5339C93A214C38B500474D73 /* neuron.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +32,22 @@
 /* Begin PBXFileReference section */
 		5339C91421474E9100474D73 /* LSTM1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LSTM1; sourceTree = BUILT_PRODUCTS_DIR; };
 		5339C91721474E9100474D73 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		5339C9232147BE0300474D73 /* memoryblock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = memoryblock.cpp; sourceTree = "<group>"; };
+		5339C9242147BE0300474D73 /* memoryblock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = memoryblock.hpp; sourceTree = "<group>"; };
+		5339C9262147BE2400474D73 /* layer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = layer.cpp; sourceTree = "<group>"; };
+		5339C9272147BE2400474D73 /* layer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = layer.hpp; sourceTree = "<group>"; };
+		5339C9292147BE2900474D73 /* network.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = network.cpp; sourceTree = "<group>"; };
+		5339C92A2147BE2900474D73 /* network.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = network.hpp; sourceTree = "<group>"; };
+		5339C92C21481D7600474D73 /* dataprocessing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dataprocessing.cpp; sourceTree = "<group>"; };
+		5339C92D21481D7600474D73 /* dataprocessing.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = dataprocessing.hpp; sourceTree = "<group>"; };
+		5339C93021482B8100474D73 /* data.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.csv; sourceTree = "<group>"; };
+		5339C93121482DAD00474D73 /* utility.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
+		5339C93221482DAD00474D73 /* utility.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = utility.hpp; sourceTree = "<group>"; };
+		5339C9352148315600474D73 /* memorycell.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = memorycell.cpp; sourceTree = "<group>"; };
+		5339C9362148315600474D73 /* memorycell.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = memorycell.hpp; sourceTree = "<group>"; };
+		5339C938214C254E00474D73 /* unit.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = unit.hpp; sourceTree = "<group>"; };
+		5339C939214C257D00474D73 /* neuron.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = neuron.hpp; sourceTree = "<group>"; };
+		5339C93A214C38B500474D73 /* neuron.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = neuron.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,8 +81,48 @@
 			isa = PBXGroup;
 			children = (
 				5339C91721474E9100474D73 /* main.cpp */,
+				5339C934214830EA00474D73 /* include */,
+				5339C91F2147BDBB00474D73 /* src */,
+				5339C92F214821B000474D73 /* data */,
 			);
 			path = LSTM1;
+			sourceTree = "<group>";
+		};
+		5339C91F2147BDBB00474D73 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				5339C93121482DAD00474D73 /* utility.cpp */,
+				5339C92C21481D7600474D73 /* dataprocessing.cpp */,
+				5339C9292147BE2900474D73 /* network.cpp */,
+				5339C9262147BE2400474D73 /* layer.cpp */,
+				5339C9232147BE0300474D73 /* memoryblock.cpp */,
+				5339C93A214C38B500474D73 /* neuron.cpp */,
+				5339C9352148315600474D73 /* memorycell.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		5339C92F214821B000474D73 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				5339C93021482B8100474D73 /* data.csv */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		5339C934214830EA00474D73 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				5339C93221482DAD00474D73 /* utility.hpp */,
+				5339C92D21481D7600474D73 /* dataprocessing.hpp */,
+				5339C92A2147BE2900474D73 /* network.hpp */,
+				5339C9272147BE2400474D73 /* layer.hpp */,
+				5339C938214C254E00474D73 /* unit.hpp */,
+				5339C9242147BE0300474D73 /* memoryblock.hpp */,
+				5339C939214C257D00474D73 /* neuron.hpp */,
+				5339C9362148315600474D73 /* memorycell.hpp */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,7 +182,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5339C93321482DAD00474D73 /* utility.cpp in Sources */,
+				5339C9252147BE0300474D73 /* memoryblock.cpp in Sources */,
+				5339C93C214C38B500474D73 /* neuron.cpp in Sources */,
+				5339C9372148315600474D73 /* memorycell.cpp in Sources */,
+				5339C92E21481D7600474D73 /* dataprocessing.cpp in Sources */,
 				5339C91821474E9100474D73 /* main.cpp in Sources */,
+				5339C92B2147BE2900474D73 /* network.cpp in Sources */,
+				5339C9282147BE2400474D73 /* layer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
