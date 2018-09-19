@@ -20,12 +20,6 @@ double utility::h(double x) {
     return 2/(1+exp(-x)) - 1;
 }
 
-void utility::printVector(const std::vector<double> & v){
-    for(double x : v){
-        std::cout << " " << x;
-    }
-}
-
 
 TransformLinear::TransformLinear(double average, double rangeMin, double rangeMax) {
     double maxDiff = (average-rangeMin) >= (rangeMax-average) ? (average-rangeMin)  : (rangeMax-average);

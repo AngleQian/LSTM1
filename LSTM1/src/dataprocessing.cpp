@@ -47,43 +47,33 @@ std::vector< std::vector<double> > dataprocessing::transformTableToDouble(std::v
     return table;
 }
 
-void dataprocessing::printTable(std::vector<std::vector<std::string> > table){
-    std::cout << "Print table: " << std::endl;
-    for(std::vector<std::string> line : table){
-        for(std::string cell : line){
-            std::cout << " " << cell;
-        }
-        std::cout << std::endl;
-    }
-}
-
-double dataprocessing::getTableColumnAverage(std::vector< std::vector<std::string> > table, int columnNumber){
+double dataprocessing::getTableColumnAverage(std::vector< std::vector<double> > table, int columnNumber){
     long double sum = 0;
     int count = 0;
     
-    for(std::vector<std::string> row : table) {
-        sum +=  stold(row[columnNumber]);
+    for(std::vector<double> row : table) {
+        sum += row[columnNumber];
         ++count;
     }
     
     return sum / count;
 }
 
-double dataprocessing::getTableColumnMax(std::vector<std::vector<std::string> > table, int columnNumber){
-    double max = stod(table[1][1]);
-    for(std::vector<std::string> row : table) {
-        if (max < stod(row[columnNumber])){
-            max = stod(row[columnNumber]);
+double dataprocessing::getTableColumnMax(std::vector<std::vector<double> > table, int columnNumber){
+    double max = table[1][1];
+    for(std::vector<double> row : table) {
+        if (max < row[columnNumber]){
+            max = row[columnNumber];
         }
     }
     return max;
 }
 
-double dataprocessing::getTableColumnMin(std::vector<std::vector<std::string> > table, int columnNumber){
-    double min = stod(table[1][1]);
-    for(std::vector<std::string> row : table) {
-        if (min > stod(row[columnNumber])){
-            min = stod(row[columnNumber]);
+double dataprocessing::getTableColumnMin(std::vector<std::vector<double> > table, int columnNumber){
+    double min = table[1][1];
+    for(std::vector<double> row : table) {
+        if (min > row[columnNumber]){
+            min = row[columnNumber];
         }
     }
     return min;

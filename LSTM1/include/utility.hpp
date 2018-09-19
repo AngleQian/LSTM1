@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-
+#include <iterator>
+#include <algorithm>
 #include <math.h>
 
 namespace utility {
@@ -20,7 +21,15 @@ namespace utility {
     double g(double);
     double h(double);
     
-    void printVector(const std::vector<double> &);
+    template<typename T>
+    void printVector(const T& t) {
+        std::copy(t.cbegin(), t.cend(), std::ostream_iterator<typename T::value_type>(std::cout, " "));
+    }
+    
+    template<typename T>
+    void printVectorInVector(const T& t) {
+        std::for_each(t.cbegin(), t.cend(), printVector<typename T::value_type>);
+    }
 }
 
 class Transform {

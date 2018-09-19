@@ -18,6 +18,11 @@ public:
     Layer(int); // for regular neuron layers
     Layer(int, int); // for LSTM layers
     
+    void forwardpass(const std::vector<double>&);
+    void forwardpass(const std::shared_ptr<Layer>);
+    
+    std::vector<double> getOutput();
+    
     void printLayer();
     
     std::vector<std::shared_ptr<Unit>>* getUnits() { return &units; }

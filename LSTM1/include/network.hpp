@@ -14,12 +14,12 @@
 class Network {
 public:
     Network(Transform*, std::vector<int>, int, std::vector< std::vector<double> >,
-            std::vector< std::vector<double> >);
+            std::vector< std::vector<double> >, std::vector< std::vector<double> >, std::vector< std::vector<double> >);
     
-    void weightInit();
+    void weightInit(int);
     
     void train();
-    void fowardpass();
+    std::vector<double> forwardpass(const std::vector<double>&);
     void backwardpass();
     void validation();
     
@@ -29,8 +29,10 @@ public:
 private:
     Transform* transform;
     std::vector<std::shared_ptr<Layer>> layers;
-    std::vector< std::vector<double> > trainingSet;
-    std::vector< std::vector<double> > validationSet;
+    std::vector< std::vector<double> > trainingInputs;
+    std::vector< std::vector<double> > validationInputs;
+    std::vector< std::vector<double> > trainingOutputs;
+    std::vector< std::vector<double> > validationOutputs;
 };
 
 #endif /* network_hpp */

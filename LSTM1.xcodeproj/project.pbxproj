@@ -61,6 +61,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53146EAE2152303E0080BE04 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
 		5339C90B21474E9100474D73 = {
 			isa = PBXGroup;
 			children = (
@@ -83,6 +90,7 @@
 				5339C91721474E9100474D73 /* main.cpp */,
 				5339C934214830EA00474D73 /* include */,
 				5339C91F2147BDBB00474D73 /* src */,
+				53146EAE2152303E0080BE04 /* lib */,
 				5339C92F214821B000474D73 /* data */,
 			);
 			path = LSTM1;

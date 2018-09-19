@@ -21,10 +21,9 @@ namespace dataprocessing {
     
     std::vector< std::vector<std::string> > readCSV(std::string);
     std::vector< std::vector<double> > transformTableToDouble(std::vector< std::vector<std::string> >);
-    double getTableColumnAverage(std::vector< std::vector<std::string> >, int);
-    double getTableColumnMax(std::vector< std::vector<std::string> >, int);
-    double getTableColumnMin(std::vector< std::vector<std::string> >, int);
-    void printTable(std::vector< std::vector<std::string> >);
+    double getTableColumnAverage(std::vector< std::vector<double> >, int);
+    double getTableColumnMax(std::vector< std::vector<double> >, int);
+    double getTableColumnMin(std::vector< std::vector<double> >, int);
 }
 
 #endif /* dataprocessing_hpp */

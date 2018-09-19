@@ -11,12 +11,15 @@
 
 #include <stdio.h>
 #include <vector>
+#include <stdlib.h>
 
 // Base class
 class Unit {
 public:
     virtual ~Unit(){};
+    virtual void forwardpass(const std::vector<double>&) = 0;
     virtual void printUnit() = 0;
+    virtual std::vector<double>* getOutput() const = 0;
 };
 
 

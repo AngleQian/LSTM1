@@ -14,24 +14,34 @@
 #include "include/network.hpp"
 
 int main(int argc, const char * argv[]) {    
-    std::vector< std::vector<std::string> > table = dataprocessing::readCSV("data.csv");
+    std::vector< std::vector<std::string> > rawTable = dataprocessing::readCSV("data.csv");
     
-    // dataprocessing::printTable(table);
+    std::vector< std::vector<std::string> > filteredTable = std::vector< std::vector<std::string> >();
+    for(std::vector<std::string> rawRow : rawTable){
+        std::vector<std::string> filteredRow = std::vector<std::string>();
+        filteredRow.push_back(rawRow[4]); // get closing price
+        filteredTable.push_back(filteredRow);
+    }
     
-    double average = dataprocessing::getTableColumnAverage(table, 1);
-    double min = dataprocessing::getTableColumnMin(table, 1);
-    double max = dataprocessing::getTableColumnMax(table, 1);
+    long size = filteredTable.size();
+    
+    std::vector< std::vector<double> > trainingInputs = dataprocessing::transformTableToDouble(std::vector< std::vector<std::string> >(filteredTable.begin(), filteredTable.begin() + round(0.8*size)));
+    
+    std::vector< std::vector<double> > validationInputs = dataprocessing::transformTableToDouble(std::vector< std::vector<std::string> >(filteredTable.begin() + round(0.8*size) + 1, filteredTable.end()));
+    
+    std::vector< std::vector<double> > trainingOutputs = trainingInputs;
+    std::vector< std::vector<double> > validationOutputs = validationInputs;
+    
+    double average = dataprocessing::getTableColumnAverage(trainingInputs, 0);
+    double min = dataprocessing::getTableColumnMin(trainingInputs, 0);
+    double max = dataprocessing::getTableColumnMax(trainingInputs, 0);
     TransformLinear transform = TransformLinear(average, min, max);
     
-    std::vector<int> topology = {1, 2, 3, 3, 2, 1};
+    std::vector<int> topology = {1, 2, 3, 2, 1};
     int cellsPerBlock = 2;
-    long size = table.size();
     
-    std::vector< std::vector<double> > trainingSet = dataprocessing::transformTableToDouble(std::vector< std::vector<std::string> >(table.begin(), table.begin() + round(0.8*size)));
-    
-    std::vector< std::vector<double> > validationSet = dataprocessing::transformTableToDouble(std::vector< std::vector<std::string> >(table.begin() + round(0.8*size) + 1, table.end()));
-    
-    Network network = Network(&transform, topology, cellsPerBlock, trainingSet, validationSet);
-    
+    Network network = Network(&transform, topology, cellsPerBlock, trainingInputs, validationInputs, trainingOutputs, validationOutputs);
+
     network.printNetwork();
+    network.train();
 }

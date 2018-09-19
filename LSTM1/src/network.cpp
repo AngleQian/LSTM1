@@ -9,9 +9,18 @@
 #include "../include/network.hpp"
 
 Network::Network(Transform* transform, std::vector<int> topology, int cellsPerBlock,
-                 std::vector< std::vector<double> > trainingSet,
-                 std::vector< std::vector<double> > validationSet): transform(transform), trainingSet(trainingSet), validationSet(validationSet){
+                 std::vector< std::vector<double> > trainingInputs,
+                 std::vector< std::vector<double> > validationInputs, std::vector< std::vector<double> > trainingOutputs, std::vector< std::vector<double> > validationOutputs): transform(transform), trainingInputs(trainingInputs), validationInputs(validationInputs), trainingOutputs(trainingOutputs), validationOutputs(validationOutputs) {
+    
     std::cout << "Creating network" << std::endl;
+    
+    if(topology[0] != trainingInputs[0].size() ||
+       topology[topology.size() - 1] != trainingOutputs[0].size() ||
+       topology[0] != validationInputs[0].size() ||
+       topology[topology.size() - 1] != validationOutputs[0].size()){
+        std::cout << "topolgy doesn't match data" << std::endl;
+        abort();
+    }
     
     // create first input layer    
     std::shared_ptr<Layer> inputLayer(new Layer(topology[0]));
@@ -27,10 +36,10 @@ Network::Network(Transform* transform, std::vector<int> topology, int cellsPerBl
     std::shared_ptr<Layer> outputLayer(new Layer(topology[topology.size() - 1]));
     Network::layers.push_back(outputLayer);
     
-    weightInit();
+    weightInit(cellsPerBlock);
 }
 
-void Network::weightInit(){
+void Network::weightInit(int cellsPerBlock){
     std::cout << "Initalizing Weights" << std::endl;
     
     // input neurons directly recieve input vector, so with weight 1
@@ -41,9 +50,9 @@ void Network::weightInit(){
         neuron->getWeights()->push_back(1);
     }
     
-    long noOfSourceUnits = layers[0]->getUnits()->size();
+    long noOfSourceUnits = layers[0]->getUnits()->size() * cellsPerBlock;
 
-    for(int i = 1; i != layers.size() - 1; i++){
+    for(int i = 1; i != layers.size() - 1; ++i){
         std::vector<std::shared_ptr<Unit>>* hiddenLayerUnits = layers[i]->getUnits();
         
         for(int j = 0; j != hiddenLayerUnits->size(); ++j){
@@ -61,7 +70,7 @@ void Network::weightInit(){
             }
         }
 
-        noOfSourceUnits = hiddenLayerUnits->size();
+        noOfSourceUnits = hiddenLayerUnits->size() * cellsPerBlock;
     }
 
     std::vector<std::shared_ptr<Unit>>* outputLayerUnits = layers[layers.size() - 1]->getUnits();
@@ -72,6 +81,46 @@ void Network::weightInit(){
             neuron->getWeights()->push_back(1);
         }
     }
+}
+
+void Network::train(){
+    for(int i = 0; i != trainingInputs.size(); ++i){
+        std::cout << "Cycle " << i+1 << std::endl;
+        utility::printVector(trainingInputs[i]);
+        std::cout << std::endl;
+        std::vector<double> output = forwardpass(trainingInputs[i]);
+        utility::printVector(output);
+        std::cout << std::endl;
+        std::cout << std::endl;
+    }
+    
+}
+
+std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
+    std::vector<double> input = std::vector<double>();
+    input.push_back(transform->transformFromPrice(inputRaw[0]));
+
+    std::shared_ptr<Layer> inputLayer = layers[0];
+    inputLayer->forwardpass(input);
+    
+    std::shared_ptr<Layer> prevLayer = inputLayer;
+    
+    for(int i = 1; i != layers.size() - 1; ++i){
+        std::shared_ptr<Layer> hiddenLayer = layers[i];
+        hiddenLayer->forwardpass(prevLayer);
+        prevLayer = hiddenLayer;
+    }
+    
+    std::shared_ptr<Layer> outputLayer = layers[layers.size() - 1];
+    outputLayer->forwardpass(prevLayer);
+    
+    std::vector<double> rawOutputs = outputLayer->getOutput();
+    std::vector<double> outputs = std::vector<double>();
+    for(double rawOutput : rawOutputs){
+        outputs.push_back(transform->transformToPrice(rawOutput));
+    }
+    
+    return outputs;
 }
 
 void Network::printNetwork(){

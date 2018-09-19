@@ -16,11 +16,16 @@ class Neuron : public Unit {
 public:
     Neuron();
     
+    void forwardpass(double);
+    void forwardpass(const std::vector<double>&);
     void printUnit();
     
     std::vector<double>* getWeights() { return &weights; }
+    std::vector<double>* getOutput() const;
 private:
     std::vector<double> weights;
+    double output;
+    
 };
 
 

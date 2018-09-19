@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <vector>
 #include <memory>
+#include <stdlib.h>
 
 #include "utility.hpp"
 
@@ -19,13 +20,17 @@ class MemoryCell {
 public:
     MemoryCell();
     
+    void forwardpass(const std::vector<double>&, double, double, double);
+    
     void printCell();
     
     std::vector<double>* getCellStateWeights() { return &cellStateWeights; }
+    double getOutput() { return output; }
 private:
     double cellStateCurrent;
     double cellStatePast;
     std::vector<double> cellStateWeights;
+    double output;
 };
 
 #endif /* memorycell_hpp */
