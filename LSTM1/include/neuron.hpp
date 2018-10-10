@@ -10,22 +10,34 @@
 #define neuron_h
 
 #include "unit.hpp"
-#include "utility.hpp"
+
+class Layer;
 
 class Neuron : public Unit {
 public:
-    Neuron();
+    Neuron(double);
     
     void forwardpass(double);
     void forwardpass(const std::vector<double>&);
+    
+    void backwardpass() {}
+    void backwardpass(const std::shared_ptr<Layer>, double);
+    
+    void calcDelta(double);
     void printUnit();
     
     std::vector<double>* getWeights() { return &weights; }
     std::vector<double>* getOutput() const;
+    double getDelta() { return delta; }
+    double getOutputWeightToCellInPrevLayer(long);
 private:
+    double alpha;
     std::vector<double> weights;
+    
+    double net;
     double output;
     
+    double delta;
 };
 
 

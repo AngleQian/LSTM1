@@ -11,25 +11,41 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include <iterator>
 #include <algorithm>
 #include <math.h>
+#include <random>
 
 namespace utility {
     double f(double);
+    double df(double);
     double g(double);
+    double dg(double);
     double h(double);
+    double dh(double);
     
     template<typename T>
-    void printVector(const T& t) {
+    void printVector(const T& t){
         std::copy(t.cbegin(), t.cend(), std::ostream_iterator<typename T::value_type>(std::cout, " "));
     }
     
     template<typename T>
-    void printVectorInVector(const T& t) {
+    void printVectorInVector(const T& t){
         std::for_each(t.cbegin(), t.cend(), printVector<typename T::value_type>);
     }
+    
+    template<typename T>
+    std::string vectorToString(const std::vector<T>& v){
+        std::ostringstream oss;
+        std::copy(v.begin(), v.end()-1, std::ostream_iterator<T>(oss, ","));
+        oss << v.back();
+        return oss.str();
+    }
+
+    double getRandomWeight(double, double);
 }
 
 class Transform {
@@ -44,8 +60,8 @@ public:
     double transformFromPrice(double);
     double transformToPrice(double);
 private:
-    const double radius = 3;
-    const double center = 0;
+    double radius = 1;
+    double center = 0.5;
     
     double translationCoeff;
     double squashCoeff;

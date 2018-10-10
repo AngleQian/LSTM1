@@ -13,10 +13,10 @@ Layer::Layer(){
 }
 
 // layer constructor for regular layers
-Layer::Layer(int neuronsPerLayer){
+Layer::Layer(int neuronsPerLayer, double alpha){
     Layer();
     for(int i = 0; i != neuronsPerLayer; ++i){
-        std::shared_ptr<Neuron> neuron(new Neuron());
+        std::shared_ptr<Neuron> neuron(new Neuron(alpha));
         std::shared_ptr<Unit> unit(neuron);
         units.push_back(unit);
     }
@@ -24,10 +24,10 @@ Layer::Layer(int neuronsPerLayer){
 
 
 // layer constructor for LSTM layers
-Layer::Layer(int blocksPerLayer, int cellsPerBlock) {
+Layer::Layer(int blocksPerLayer, int cellsPerBlock, double alpha, long noOfSourceUnits) {
     Layer();
     for(int i = 0; i != blocksPerLayer; ++i){
-        std::shared_ptr<MemoryBlock> memoryBlock(new MemoryBlock(cellsPerBlock));
+        std::shared_ptr<MemoryBlock> memoryBlock(new MemoryBlock(cellsPerBlock, alpha, noOfSourceUnits));
         std::shared_ptr<Unit> unit(memoryBlock);
         units.push_back(unit);
     }
@@ -45,18 +45,36 @@ void Layer::forwardpass(const std::vector<double>& input){
 
 // forwardpass for other layers, receives ptr to the previous layer
 void Layer::forwardpass(const std::shared_ptr<Layer> prevLayer){
-    std::vector<double> inputs = prevLayer->getOutput();
+    std::vector<double>* inputs = prevLayer->getOutput();
     for(std::shared_ptr<Unit> unit : units){
-        unit->forwardpass(inputs);
+        unit->forwardpass(*inputs);
     }
 }
 
-// gets the output of the layer, usually used for the output layer
-std::vector<double> Layer::getOutput(){
-    std::vector<double> output = std::vector<double>();
+// backward pass for output layer, receives vector of external errors e_k(t)
+void Layer::backwardpass(const std::shared_ptr<Layer> prevLayer, const std::vector<double>& externalError){
+    for(int i = 0; i != units.size(); ++i){
+        std::shared_ptr<Unit> unit = units[i];
+        std::shared_ptr<Neuron> neuron = std::dynamic_pointer_cast<Neuron>(unit);
+        neuron->backwardpass(prevLayer, externalError[i]);
+    }
+}
+
+// backward pass for hidden layers
+void Layer::backwardpass(const std::shared_ptr<Layer> prevLayer, const std::shared_ptr<Layer> nextLayer){
+    for(int i = 0; i != units.size(); ++i){
+        std::shared_ptr<Unit> unit = units[i];
+        std::shared_ptr<MemoryBlock> memoryBlock = std::dynamic_pointer_cast<MemoryBlock>(unit);
+        memoryBlock->backwardpass(prevLayer, nextLayer, i);
+    }
+}
+
+// gets the output of the layer
+std::vector<double>* Layer::getOutput() const{
+    std::vector<double>* output = new std::vector<double>();
     for(std::shared_ptr<Unit> unit : units){
         std::vector<double>* unitOutput = unit->getOutput();
-        output.insert(output.end(), unitOutput->begin(), unitOutput->end());
+        output->insert(output->end(), unitOutput->begin(), unitOutput->end());
     }
     return output;
 }

@@ -9,18 +9,22 @@
 #ifndef network_hpp
 #define network_hpp
 
+#include <iostream>
+#include <fstream>
+
 #include "layer.hpp"
+#include "dataprocessing.hpp"
 
 class Network {
 public:
-    Network(Transform*, std::vector<int>, int, std::vector< std::vector<double> >,
+    Network(Transform*, std::vector<int>, int, double, std::vector< std::vector<double> >,
             std::vector< std::vector<double> >, std::vector< std::vector<double> >, std::vector< std::vector<double> >);
     
     void weightInit(int);
     
     void train();
     std::vector<double> forwardpass(const std::vector<double>&);
-    void backwardpass();
+    void backwardpass(const std::vector<double>&, const std::vector<double>&);
     void validation();
     
     void printNetwork();

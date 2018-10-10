@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 #include "include/dataprocessing.hpp"
@@ -29,19 +30,27 @@ int main(int argc, const char * argv[]) {
     
     std::vector< std::vector<double> > validationInputs = dataprocessing::transformTableToDouble(std::vector< std::vector<std::string> >(filteredTable.begin() + round(0.8*size) + 1, filteredTable.end()));
     
-    std::vector< std::vector<double> > trainingOutputs = trainingInputs;
-    std::vector< std::vector<double> > validationOutputs = validationInputs;
+    std::vector< std::vector<double> > trainingOutputs = std::vector< std::vector<double> >(trainingInputs.begin()+1, trainingInputs.end());
+    std::vector< std::vector<double> > validationOutputs = std::vector< std::vector<double> >(validationInputs.begin()+1, validationInputs.end());
     
     double average = dataprocessing::getTableColumnAverage(trainingInputs, 0);
     double min = dataprocessing::getTableColumnMin(trainingInputs, 0);
     double max = dataprocessing::getTableColumnMax(trainingInputs, 0);
     TransformLinear transform = TransformLinear(average, min, max);
     
-    std::vector<int> topology = {1, 2, 3, 2, 1};
+    std::vector<int> topology = {1, 3, 3, 1};
     int cellsPerBlock = 2;
+    double alpha = 10;
     
-    Network network = Network(&transform, topology, cellsPerBlock, trainingInputs, validationInputs, trainingOutputs, validationOutputs);
-
+    Network network = Network(&transform, topology, cellsPerBlock, alpha, trainingInputs, validationInputs, trainingOutputs, validationOutputs);
+    
+    std::cout << "Training Period: " << rawTable[0][0] << " - " << rawTable[trainingInputs.size()][0] << std::endl;
+    std::cout << "Validation Period: " << rawTable[trainingInputs.size()+1][0] << " - " << rawTable[size-1][0] << std::endl << std::endl;
+    
     network.printNetwork();
     network.train();
+    network.printNetwork();
+    
+    
+    
 }

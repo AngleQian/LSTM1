@@ -11,7 +11,7 @@
 std::vector< std::vector<std::string> > dataprocessing::readCSV(std::string filename){
     std::vector< std::vector<std::string> > ret = std::vector< std::vector<std::string> >();
     
-    std::string path = dataprocessing::baseDirectory + "/" + filename;
+    std::string path = dataprocessing::baseDirectory + "data/" + filename;
     
     std::ifstream csv(path);
     std::string line;

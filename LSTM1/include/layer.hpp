@@ -15,13 +15,16 @@
 class Layer{
 public:
     Layer(); // base constructor
-    Layer(int); // for regular neuron layers
-    Layer(int, int); // for LSTM layers
+    Layer(int, double); // for regular neuron layers
+    Layer(int, int, double, long); // for LSTM layers
     
     void forwardpass(const std::vector<double>&);
     void forwardpass(const std::shared_ptr<Layer>);
     
-    std::vector<double> getOutput();
+    void backwardpass(const std::shared_ptr<Layer>, const std::vector<double>&);
+    void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>);
+    
+    std::vector<double>* getOutput() const;
     
     void printLayer();
     

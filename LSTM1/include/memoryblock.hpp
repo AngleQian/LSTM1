@@ -12,11 +12,19 @@
 #include "memorycell.hpp"
 #include "unit.hpp"
 
+class Layer;
+
 class MemoryBlock : public Unit {
 public:
-    MemoryBlock(int);
+    MemoryBlock(int, double, long);
     
     void forwardpass(const std::vector<double>&);
+    
+    void backwardpass() {};
+    void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, int);
+    
+    void calcDelta(const std::shared_ptr<Layer>, int);
+    void calcInternalErrorGatePartials(double*, double*, const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, MemoryBlock*, int, int);
     
     void printUnit();
     
@@ -25,16 +33,29 @@ public:
     std::vector<double>* getForgetGateWeights() { return &forgetGateWeights; }
     std::vector<double>* getOutputGateWeights() { return &outputGateWeights; }
     std::vector<double>* getOutput() const;
+    double getDelta() { return delta; }
+    double getOutputWeightToCellInPrevLayer(long);
+    double getInputNet() { return inputNet; }
+    double getInputGate() { return inputGate; }
+    double getForgetNet() { return forgetNet; }
+    double getForgetGate() { return forgetGate; }
+    double getOutputGate() { return outputGate; }
 private:
+    double alpha;
     std::vector<std::shared_ptr<MemoryCell>> memoryCells;
     
     std::vector<double> inputGateWeights;
     std::vector<double> forgetGateWeights;
     std::vector<double> outputGateWeights;
     
+    double inputNet;
     double inputGate;
+    double forgetNet;
     double forgetGate;
+    double outputNet;
     double outputGate;
+    
+    double delta;
 };
 
 #endif /* neuron_hpp */

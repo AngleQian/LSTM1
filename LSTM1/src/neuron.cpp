@@ -7,8 +7,9 @@
 //
 
 #include "../include/neuron.hpp"
+#include "../include/layer.hpp"
 
-Neuron::Neuron(){
+Neuron::Neuron(double alpha) : alpha(alpha) {
     
 }
 
@@ -19,11 +20,30 @@ void Neuron::forwardpass(double input){
 }
 
 void Neuron::forwardpass(const std::vector<double>& inputs){
-    double net = 0;
+    net = 0;
     for(int i = 0; i != inputs.size(); ++i){
         net += inputs[i] * weights[i];
     }
     output = utility::f(net);
+}
+
+void Neuron::backwardpass(const std::shared_ptr<Layer> prevLayer, double externalError){
+    calcDelta(externalError);
+    
+    double deltaWeight;
+    for(int i = 0; i != weights.size(); ++i){
+        deltaWeight = alpha * delta * prevLayer->getOutput()->at(i);
+        weights[i] += deltaWeight;
+    }
+}
+
+void Neuron::calcDelta(double externalError){
+    delta = utility::df(net) * externalError;
+}
+
+void Neuron::printUnit(){
+    std::cout << "W: ";
+    utility::printVector(weights);
 }
 
 std::vector<double>* Neuron::getOutput() const{
@@ -32,7 +52,6 @@ std::vector<double>* Neuron::getOutput() const{
     return outputVec;
 }
 
-void Neuron::printUnit(){
-    std::cout << "W: ";
-    utility::printVector(weights);
+double Neuron::getOutputWeightToCellInPrevLayer(long cellPosition){
+    return weights[cellPosition];
 }
