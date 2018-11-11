@@ -14,20 +14,19 @@
 
 class Layer{
 public:
-    Layer(); // base constructor
-    Layer(int, double); // for regular neuron layers
-    Layer(int, int, double, long); // for LSTM layers
+    Layer();
+    Layer(int, double);
+    Layer(int, int, double, long);
     
     void forwardpass(const std::vector<double>&);
     void forwardpass(const std::shared_ptr<Layer>);
-    
     void backwardpass(const std::shared_ptr<Layer>, const std::vector<double>&);
     void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>);
     
-    std::vector<double>* getOutput() const;
-    
+    void flushState();
     void printLayer();
     
+    std::vector<double>* getOutput() const;
     std::vector<std::shared_ptr<Unit>>* getUnits() { return &units; }
 private:
     std::vector<std::shared_ptr<Unit>> units;

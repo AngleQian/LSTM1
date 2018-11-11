@@ -69,6 +69,12 @@ void Layer::backwardpass(const std::shared_ptr<Layer> prevLayer, const std::shar
     }
 }
 
+void Layer::flushState(){
+    for(int i = 0; i != units.size(); ++i){
+        units[i]->flushState();
+    }
+}
+
 // gets the output of the layer
 std::vector<double>* Layer::getOutput() const{
     std::vector<double>* output = new std::vector<double>();

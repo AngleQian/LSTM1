@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -26,6 +27,8 @@ namespace utility {
     double dg(double);
     double h(double);
     double dh(double);
+    double nofunc(double x);
+    double dnofunc(double x);
     
     template<typename T>
     void printVector(const T& t){
@@ -61,10 +64,16 @@ public:
     double transformToPrice(double);
 private:
     double radius = 1;
-    double center = 0.5;
+    double center = 0;
     
     double translationCoeff;
     double squashCoeff;
+};
+
+class NoTransform : public Transform {
+public:
+    double transformFromPrice(double x) { return x; }
+    double transformToPrice(double x) { return x; }
 };
 
 #endif /* utility_hpp */

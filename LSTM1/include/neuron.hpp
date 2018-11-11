@@ -19,11 +19,11 @@ public:
     
     void forwardpass(double);
     void forwardpass(const std::vector<double>&);
-    
     void backwardpass() {}
     void backwardpass(const std::shared_ptr<Layer>, double);
-    
     void calcDelta(double);
+    
+    void flushState();
     void printUnit();
     
     std::vector<double>* getWeights() { return &weights; }

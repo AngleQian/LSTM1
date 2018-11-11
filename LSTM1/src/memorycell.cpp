@@ -45,6 +45,7 @@ void MemoryCell::backwardpass(const std::shared_ptr<Layer> prevLayer, MemoryBloc
     for(int i = 0; i != cellStateWeights.size(); ++i){
         internalErrorCellStatePartial = internalError * (internalErrorCellStatePartialPast[i] * memoryBlock->getForgetGate() + utility::dg(cellStateNet) * memoryBlock->getInputGate() * prevLayer->getOutput()->at(i));
         deltaCellStateWeight = alpha * internalErrorCellStatePartial;
+//        std::cout << "dCSW: " << deltaCellStateWeight << std::endl;
         cellStateWeights[i] += deltaCellStateWeight;
     }
 }
@@ -73,6 +74,10 @@ void MemoryCell::calcInternalError(const std::shared_ptr<Layer> nextLayer, Memor
     for(std::shared_ptr<Unit> unit : *nextLayer->getUnits()){
         internalError += factor * (unit->getDelta() * unit->getOutputWeightToCellInPrevLayer(cellPosition));
     }
+}
+
+void MemoryCell::flushState(){
+    cellStatePast = 0;
 }
 
 void MemoryCell::printCell(){

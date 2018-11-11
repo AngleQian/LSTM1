@@ -17,10 +17,11 @@
 #include <vector>
 
 namespace dataprocessing {
-    const std::string baseDirectory = "/Users/angleqian/Drive Sync/Extended Essay/LSTM1/LSTM1/data/";
+    const std::string baseDirectory = "/Users/angleqian/Drive Sync/Extended Essay/LSTM1/LSTM1/";
     
     std::vector< std::vector<std::string> > readCSV(std::string);
     std::vector< std::vector<double> > transformTableToDouble(std::vector< std::vector<std::string> >);
+    std::vector< std::vector<double> > processedTable(std::vector< std::vector<double> >);
     double getTableColumnAverage(std::vector< std::vector<double> >, int);
     double getTableColumnMax(std::vector< std::vector<double> >, int);
     double getTableColumnMin(std::vector< std::vector<double> >, int);

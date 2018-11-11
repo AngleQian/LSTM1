@@ -19,13 +19,12 @@ public:
     MemoryBlock(int, double, long);
     
     void forwardpass(const std::vector<double>&);
-    
     void backwardpass() {};
     void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, int);
-    
     void calcDelta(const std::shared_ptr<Layer>, int);
     void calcInternalErrorGatePartials(double*, double*, const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, MemoryBlock*, int, int);
     
+    void flushState();
     void printUnit();
     
     std::vector<std::shared_ptr<MemoryCell>>* getMemoryCells() { return &memoryCells; }

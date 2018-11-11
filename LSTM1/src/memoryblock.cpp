@@ -42,9 +42,15 @@ void MemoryBlock::forwardpass(const std::vector<double> & inputs){
 void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std::shared_ptr<Layer> nextLayer, int blockPosition){
     calcDelta(nextLayer, blockPosition);
     
+    std::ofstream file;
+    std::string directory = "/Users/angleqian/Drive Sync/Extended Essay/LSTM1/LSTM1/output/debug1.txt";
+    
+    file.open(directory, std::ios_base::app);
+    
     double deltaOutputWeight;
     for(int i = 0; i != outputGateWeights.size(); ++i){
         deltaOutputWeight = alpha * delta * prevLayer->getOutput()->at(i);
+//      std::cout << "dOW: " << deltaOutputWeight << std::endl;
         outputGateWeights[i] += deltaOutputWeight;
     }
     
@@ -57,8 +63,10 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
     for(int i = 0; i != inputGateWeights.size(); ++i){
         calcInternalErrorGatePartials(&internalErrorInputPartial, &internalErrorForgetPartial, prevLayer, nextLayer, this, blockPosition, i);
         deltaInputWeight = alpha * internalErrorInputPartial;
+//        std::cout << "dIW: " << deltaInputWeight << std::endl;
         inputGateWeights[i] += deltaInputWeight;
         deltaForgetWeight = alpha * internalErrorForgetPartial;
+//        std::cout << "dFW: " << deltaForgetWeight << std::endl;
         forgetGateWeights[i] += deltaForgetWeight;
     }
     
@@ -95,6 +103,12 @@ void MemoryBlock::calcInternalErrorGatePartials(double* internalErrorInputPartia
         memoryCells[i]->calcInternalErrorGatePartials(&iEIPtemp, &iEFPtemp, prevLayer, nextLayer, memoryBlock, cellPosition, sourceUnitIndex);
         *internalErrorInputPartial += iEIPtemp;
         *internalErrorForgetPartial += iEFPtemp;
+    }
+}
+
+void MemoryBlock::flushState(){
+    for(int i = 0; i != memoryCells.size(); ++i){
+        memoryCells[i]->flushState();
     }
 }
 

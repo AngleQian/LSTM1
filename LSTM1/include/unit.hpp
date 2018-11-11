@@ -15,13 +15,16 @@
 
 #include "utility.hpp"
 
-// Base class
 class Unit {
 public:
     virtual ~Unit(){};
+    
     virtual void forwardpass(const std::vector<double>&) = 0;
     virtual void backwardpass() = 0;
+    
+    virtual void flushState() = 0;
     virtual void printUnit() = 0;
+    
     virtual std::vector<double>* getOutput() const = 0;
     virtual double getDelta() = 0;
     virtual double getOutputWeightToCellInPrevLayer(long) = 0;

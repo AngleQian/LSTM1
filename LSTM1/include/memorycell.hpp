@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include <stdlib.h>
+#include <cmath>
 
 #include "utility.hpp"
 
@@ -24,13 +25,12 @@ public:
     MemoryCell(double, long);
     
     void forwardpass(const std::vector<double>&, double, double, double);
-    
     void backwardpass(const std::shared_ptr<Layer>, MemoryBlock*, long);
-    
     void calcDelta(const std::shared_ptr<Layer>, long);
     void calcInternalErrorGatePartials(double*, double*, const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, MemoryBlock*, long, int);
     void calcInternalError(const std::shared_ptr<Layer>, MemoryBlock*, long);
     
+    void flushState();
     void printCell();
     
     std::vector<double>* getCellStateWeights() { return &cellStateWeights; }

@@ -9,9 +9,6 @@
 #ifndef network_hpp
 #define network_hpp
 
-#include <iostream>
-#include <fstream>
-
 #include "layer.hpp"
 #include "dataprocessing.hpp"
 
@@ -21,17 +18,18 @@ public:
             std::vector< std::vector<double> >, std::vector< std::vector<double> >, std::vector< std::vector<double> >);
     
     void weightInit(int);
-    
     void train();
     std::vector<double> forwardpass(const std::vector<double>&);
-    void backwardpass(const std::vector<double>&, const std::vector<double>&);
-    void validation();
+    double backwardpass(const std::vector<double>&, const std::vector<double>&);
+    double validate();
     
+    void flushState();
     void printNetwork();
     
     std::vector<std::shared_ptr<Layer>>* getLayers() { return &layers; }
 private:
     Transform* transform;
+    double alpha;
     std::vector<std::shared_ptr<Layer>> layers;
     std::vector< std::vector<double> > trainingInputs;
     std::vector< std::vector<double> > validationInputs;

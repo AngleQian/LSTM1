@@ -11,7 +11,7 @@
 std::vector< std::vector<std::string> > dataprocessing::readCSV(std::string filename){
     std::vector< std::vector<std::string> > ret = std::vector< std::vector<std::string> >();
     
-    std::string path = dataprocessing::baseDirectory + "data/" + filename;
+    std::string path = baseDirectory + "data/"+ filename;
     
     std::ifstream csv(path);
     std::string line;
@@ -46,6 +46,11 @@ std::vector< std::vector<double> > dataprocessing::transformTableToDouble(std::v
     
     return table;
 }
+
+//std::vector< std::vector<double> > dataprocessing::processedTable(std::vector<std::vector<double> > rawTable){
+//    std::vector< std::vector<double> > output = std::vector< std::vector<double> >();
+//    
+//}
 
 double dataprocessing::getTableColumnAverage(std::vector< std::vector<double> > table, int columnNumber){
     long double sum = 0;

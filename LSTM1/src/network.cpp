@@ -10,15 +10,15 @@
 
 Network::Network(Transform* transform, std::vector<int> topology, int cellsPerBlock, double alpha,
                  std::vector< std::vector<double> > trainingInputs,
-                 std::vector< std::vector<double> > validationInputs, std::vector< std::vector<double> > trainingOutputs, std::vector< std::vector<double> > validationOutputs): transform(transform), trainingInputs(trainingInputs), validationInputs(validationInputs), trainingOutputs(trainingOutputs), validationOutputs(validationOutputs) {
+                 std::vector< std::vector<double> > trainingOutputs, std::vector< std::vector<double> > validationInputs, std::vector< std::vector<double> > validationOutputs): transform(transform), alpha(alpha), trainingInputs(trainingInputs), validationInputs(validationInputs), trainingOutputs(trainingOutputs), validationOutputs(validationOutputs) {
     
-    std::cout << "Creating network" << std::endl;
+//    std::cout << "Creating network" << std::endl;
     
     if(topology[0] != trainingInputs[0].size() ||
        topology[topology.size() - 1] != trainingOutputs[0].size() ||
        topology[0] != validationInputs[0].size() ||
        topology[topology.size() - 1] != validationOutputs[0].size()){
-        std::cout << "topolgy doesn't match data" << std::endl;
+        std::cout << "topology doesn't match data" << std::endl;
         abort();
     }
     
@@ -30,6 +30,7 @@ Network::Network(Transform* transform, std::vector<int> topology, int cellsPerBl
     
     //create first LSTM layer
     std::shared_ptr<Layer> layer(new Layer(topology[1], cellsPerBlock, alpha, prevLayer->getUnits()->size()));
+    Network::layers.push_back(layer);
     prevLayer = layer;
     
     // create subsequent LSTM layers
@@ -47,7 +48,7 @@ Network::Network(Transform* transform, std::vector<int> topology, int cellsPerBl
 }
 
 void Network::weightInit(int cellsPerBlock){
-    std::cout << "Initalizing Weights" << std::endl;
+//     std::cout << "Initalizing Weights" << std::endl;
     
     // input neurons directly recieve input vector, so with weight 1
     std::vector<std::shared_ptr<Unit>>* inputLayerUnits = layers[0]->getUnits();
@@ -92,41 +93,87 @@ void Network::weightInit(int cellsPerBlock){
 
 void Network::train(){
     std::ofstream file1;
-    std::string directory;
-    directory = dataprocessing::baseDirectory + "output/" + "trainingOutput.txt";
+    std::ofstream file2;
+    std::string directory = dataprocessing::baseDirectory + "output/" + "trainingOutput.txt";
+    std::string directory2 = dataprocessing::baseDirectory + "output/" + "trainingError.txt";
     file1.open(directory);
+    file2.open(directory2);
     
-    std::cout << "Cycle " << 1 << std::endl;
+    double error;
+    double sumOfError = 0;
+    std::vector<double> inputs;
+    std::vector<double> targetOutputs;  
+    std::vector<double> outputs;
     
-    std::vector<double> outputs = forwardpass(trainingInputs[0]);
-    
-    utility::printVector(trainingInputs[0]);
-    std::cout << std::endl;
-    utility::printVector(outputs);
-    std::cout << std::endl;
-    std::cout << std::endl;
-    
-    file1 << trainingInputs[0][0] << "," << outputs[0] << "\n";
-    
-    for(int i = 1; i != trainingInputs.size(); ++i){
-        std::cout << "Cycle" << i+1 << ": " << std::endl;
+    for(int i = 0; i != trainingInputs.size(); ++i){
+        inputs = trainingInputs[i];
+        outputs = forwardpass(inputs);
+        targetOutputs = trainingOutputs[i];
+        error = abs(backwardpass(targetOutputs, outputs));
+        sumOfError += error;
         
-        outputs = forwardpass(trainingInputs[i]);
-        
-        std::vector<double> targetOutputs = trainingOutputs[i-1];
-        backwardpass(targetOutputs, outputs);
-        
-        utility::printVector(trainingInputs[i]);
-        std::cout << std::endl;
-        utility::printVector(outputs);
-        std::cout << std::endl;
-        std::cout << std::endl;
-        
-        file1 << trainingInputs[i][0] << "," << outputs[0] << "\n";
-        
+//        std::cout << "Training cycle " << i+1 << ": " << std::endl;
+//        std::cout << "Input: ";
+//        utility::printVector(inputs);
+//        std::cout << std::endl << "Target output: ";
+//        utility::printVector(targetOutputs);
+//        std::cout << std::endl << "Output: ";
+//        utility::printVector(outputs);
+//        std::cout << std::endl << "Error: " << error;
+//        std::cout << std::endl << std::endl;
+
+        file1 << targetOutputs[0] << "," << outputs[0] << "\n";
+        file2 << error << "\n";
     }
+//    std::cout << std::endl;
+//    std::cout << "Avg error during training: " << (double) sumOfError / (trainingInputs.size()-1) << std::endl;
     file1.close();
+    file2.close();
+}
+
+double Network::validate(){
+    std::ofstream file1;
+//    std::ofstream file2;
+    std::string directory = dataprocessing::baseDirectory + "output/" + "validationOutput.txt";
+//    std::string directory2 = dataprocessing::baseDirectory + "output/" + "validationError.txt";
+    file1.open(directory);
+//    file2.open(directory2);
     
+//     flushState();
+
+    double error;
+    double sumOfError = 0;
+    std::vector<double> inputs;
+    std::vector<double> targetOutputs;
+    std::vector<double> outputs;
+    
+    for(int i = 0; i != validationInputs.size() - 1; ++i){
+        inputs = validationInputs[i];
+        outputs = forwardpass(inputs);
+        targetOutputs = validationOutputs[i];
+        
+        error = abs(targetOutputs[0] - outputs[0]);
+        sumOfError += error;
+        
+//        std::cout << "Validation cycle " << i+1 << ": " << std::endl;
+//        std::cout << "Input: ";
+//        utility::printVector(inputs);
+//        std::cout << std::endl << "Target output: ";
+//        utility::printVector(targetOutputs);
+//        std::cout << std::endl << "Output: ";
+//        utility::printVector(outputs);
+//        std::cout << std::endl << "Error: " << error;
+//        std::cout << std::endl << std::endl;
+        
+        file1 << targetOutputs[0] << "," << outputs[0] << "\n";
+//        file2 << error << "\n";
+    }
+//    std::cout << std::endl;
+//    std::cout << "Avg error during validation: " << (double) sumOfError / (validationInputs.size()-1) << std::endl;
+    file1.close();
+//    file2.close();
+    
+    return (double) sumOfError / (validationInputs.size()-1);
 }
 
 std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
@@ -157,15 +204,11 @@ std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
     return outputs;
 }
 
-void Network::backwardpass(const std::vector<double>& targetOutput, const std::vector<double>& output){
+double Network::backwardpass(const std::vector<double>& targetOutput, const std::vector<double>& output){
     std::vector<double> externalError = std::vector<double>();
     for(int i = 0; i != targetOutput.size(); ++i){
         externalError.push_back(transform->transformFromPrice(targetOutput[i]) - transform->transformFromPrice(output[i]));
     }
-    
-    std::cout << "Error: ";
-    utility::printVector(externalError);
-    std::cout << std::endl;
     
     std::shared_ptr<Layer> outputLayer = layers[layers.size()-1];
     std::shared_ptr<Layer> prevLayer = layers[layers.size()-2];
@@ -180,11 +223,19 @@ void Network::backwardpass(const std::vector<double>& targetOutput, const std::v
         prevLayer = layers[i-1];
         hiddenLayer->backwardpass(prevLayer, nextLayer);
     }
+    
+    return externalError[0];
+}
+
+void Network::flushState(){
+    for(int i = 0; i != layers.size(); ++i){
+        layers[i]->flushState();
+    }
 }
 
 void Network::printNetwork(){
     std::cout << "Printing Network" << std::endl;
-    for(int i = 0; i != layers.size(); i++){
+    for(int i = 0; i != layers.size(); ++i){
         std::cout << "------------------------------------ Layer: " << i+1;
         std::cout << " ------------------------------------" << std::endl;
         layers[i]->printLayer();
