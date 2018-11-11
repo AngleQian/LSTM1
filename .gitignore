@@ -1,0 +1,8 @@
+LSTM1.xcodeproj
+
+.DS_store
+
+/LSTM1/data/*
+/LSTM1/output/*
+/data/*
+/output/*
