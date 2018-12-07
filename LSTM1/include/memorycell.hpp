@@ -33,12 +33,12 @@ public:
     void flushState();
     void printCell();
     
-    std::vector<double>* getCellStateWeights() { return &cellStateWeights; }
+    std::shared_ptr<std::vector<double>> getCellStateWeights() { return cellStateWeights; }
     double getOutput() { return output; }
     double getDelta() { return delta; }
 private:
     double alpha;
-    std::vector<double> cellStateWeights;
+    std::shared_ptr<std::vector<double>> cellStateWeights;
     
     double cellStateNet;
     double cellStateCandidate;

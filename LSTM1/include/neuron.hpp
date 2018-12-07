@@ -26,13 +26,13 @@ public:
     void flushState();
     void printUnit();
     
-    std::vector<double>* getWeights() { return &weights; }
-    std::vector<double>* getOutput() const;
+    std::shared_ptr<std::vector<double>> getWeights() { return weights; }
+    std::shared_ptr<std::vector<double>> getOutput() const;
     double getDelta() { return delta; }
     double getOutputWeightToCellInPrevLayer(long);
 private:
     double alpha;
-    std::vector<double> weights;
+    std::shared_ptr<std::vector<double>> weights;
     
     double net;
     double output;

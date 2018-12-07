@@ -4,13 +4,15 @@ clc;
 %data = csvread('trainingOutput.txt');
 data = csvread('validationOutput.txt');
 
-trueprice = data(:, 1);
-outputprice = data(:, 2);
+%inputprice = data(1:(end-0), 1);
+trueprice = data(1:(end-0), 2);
+outputprice = data(1:end, 3);
 
 x = linspace(1, size(trueprice, 1), size(trueprice, 1));
 
 plot(x, trueprice, 'Color', 'b'); hold on;
-plot(x, outputprice, 'Color', 'r');
+plot(x, outputprice, 'Color', 'r'); hold on;
+%plot(x, inputprice, 'Color', 'g');
 
 set(legend, 'interpreter', 'latex', 'FontSize', 18);
 legend('True', 'Predicted', 'Location', 'southeast');

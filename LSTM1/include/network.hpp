@@ -16,17 +16,15 @@ class Network {
 public:
     Network(Transform*, std::vector<int>, int, double, std::vector< std::vector<double> >,
             std::vector< std::vector<double> >, std::vector< std::vector<double> >, std::vector< std::vector<double> >);
-    
     void weightInit(int);
     void train();
     std::vector<double> forwardpass(const std::vector<double>&);
     double backwardpass(const std::vector<double>&, const std::vector<double>&);
     double validate();
-    
     void flushState();
     void printNetwork();
+    std::shared_ptr<std::vector<std::shared_ptr<Layer>>> getLayers() { return std::make_shared<std::vector<std::shared_ptr<Layer>>>(layers); }
     
-    std::vector<std::shared_ptr<Layer>>* getLayers() { return &layers; }
 private:
     Transform* transform;
     double alpha;

@@ -16,18 +16,17 @@ Layer::Layer(){
 Layer::Layer(int neuronsPerLayer, double alpha){
     Layer();
     for(int i = 0; i != neuronsPerLayer; ++i){
-        std::shared_ptr<Neuron> neuron(new Neuron(alpha));
+        std::shared_ptr<Neuron> neuron = std::make_shared<Neuron>(alpha);
         std::shared_ptr<Unit> unit(neuron);
         units.push_back(unit);
     }
 }
 
-
 // layer constructor for LSTM layers
 Layer::Layer(int blocksPerLayer, int cellsPerBlock, double alpha, long noOfSourceUnits) {
     Layer();
     for(int i = 0; i != blocksPerLayer; ++i){
-        std::shared_ptr<MemoryBlock> memoryBlock(new MemoryBlock(cellsPerBlock, alpha, noOfSourceUnits));
+        std::shared_ptr<MemoryBlock> memoryBlock = std::make_shared<MemoryBlock>(cellsPerBlock, alpha, noOfSourceUnits);
         std::shared_ptr<Unit> unit(memoryBlock);
         units.push_back(unit);
     }
@@ -45,10 +44,11 @@ void Layer::forwardpass(const std::vector<double>& input){
 
 // forwardpass for other layers, receives ptr to the previous layer
 void Layer::forwardpass(const std::shared_ptr<Layer> prevLayer){
-    std::vector<double>* inputs = prevLayer->getOutput();
+    std::shared_ptr<std::vector<double>> inputs = prevLayer->getOutput();
     for(std::shared_ptr<Unit> unit : units){
         unit->forwardpass(*inputs);
     }
+
 }
 
 // backward pass for output layer, receives vector of external errors e_k(t)
@@ -76,10 +76,10 @@ void Layer::flushState(){
 }
 
 // gets the output of the layer
-std::vector<double>* Layer::getOutput() const{
-    std::vector<double>* output = new std::vector<double>();
+std::shared_ptr<std::vector<double>> Layer::getOutput() const{
+    std::shared_ptr<std::vector<double>> output = std::make_shared<std::vector<double>>();
     for(std::shared_ptr<Unit> unit : units){
-        std::vector<double>* unitOutput = unit->getOutput();
+        std::shared_ptr<std::vector<double>> unitOutput = unit->getOutput();
         output->insert(output->end(), unitOutput->begin(), unitOutput->end());
     }
     return output;
@@ -91,4 +91,8 @@ void Layer::printLayer(){
         units[i]->printUnit();
         std::cout << std::endl;
     }
+}
+
+Layer::~Layer(){
+    units.clear();
 }

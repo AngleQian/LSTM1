@@ -47,11 +47,6 @@ std::vector< std::vector<double> > dataprocessing::transformTableToDouble(std::v
     return table;
 }
 
-//std::vector< std::vector<double> > dataprocessing::processedTable(std::vector<std::vector<double> > rawTable){
-//    std::vector< std::vector<double> > output = std::vector< std::vector<double> >();
-//    
-//}
-
 double dataprocessing::getTableColumnAverage(std::vector< std::vector<double> > table, int columnNumber){
     long double sum = 0;
     int count = 0;

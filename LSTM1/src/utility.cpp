@@ -32,6 +32,14 @@ double utility::dh(double x){
     return 2 * df(x);
 }
 
+double utility::nofunc(double x){
+    return x;
+}
+
+double utility::dnofunc(double x){
+    return 1.0;
+}
+
 double utility::getRandomWeight(double a, double b){
     std::random_device rd;
     std::mt19937 gen(rd());

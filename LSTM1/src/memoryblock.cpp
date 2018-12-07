@@ -11,12 +11,12 @@
 
 MemoryBlock::MemoryBlock(int cellsPerBlock, double alpha, long noOfSourceUnits) : alpha(alpha) {
     for(int i = 0; i != cellsPerBlock; ++i){
-        std::shared_ptr<MemoryCell> memoryCell(new MemoryCell(alpha, noOfSourceUnits));
+        std::shared_ptr<MemoryCell> memoryCell = std::make_shared<MemoryCell>(alpha, noOfSourceUnits);
         memoryCells.push_back(memoryCell);
     }
-    inputGateWeights = std::vector<double>();
-    forgetGateWeights = std::vector<double>();
-    outputGateWeights = std::vector<double>();
+    inputGateWeights = std::make_shared<std::vector<double>>();
+    forgetGateWeights = std::make_shared<std::vector<double>>();
+    outputGateWeights = std::make_shared<std::vector<double>>();
 }
 
 void MemoryBlock::forwardpass(const std::vector<double> & inputs){
@@ -25,9 +25,9 @@ void MemoryBlock::forwardpass(const std::vector<double> & inputs){
     outputNet = 0;
     
     for(int i = 0; i != inputs.size(); ++i){
-        inputNet += inputs[i] * inputGateWeights[i];
-        forgetNet += inputs[i] * forgetGateWeights[i];
-        outputNet += inputs[i] * outputGateWeights[i];
+        inputNet += inputs[i] * inputGateWeights->at(i);
+        forgetNet += inputs[i] * forgetGateWeights->at(i);
+        outputNet += inputs[i] * outputGateWeights->at(i);
     }
     
     inputGate = utility::f(inputNet);
@@ -48,10 +48,11 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
     file.open(directory, std::ios_base::app);
     
     double deltaOutputWeight;
-    for(int i = 0; i != outputGateWeights.size(); ++i){
+    for(int i = 0; i != outputGateWeights->size(); ++i){
         deltaOutputWeight = alpha * delta * prevLayer->getOutput()->at(i);
 //      std::cout << "dOW: " << deltaOutputWeight << std::endl;
-        outputGateWeights[i] += deltaOutputWeight;
+        outputGateWeights->at(i) += deltaOutputWeight;
+        file << deltaOutputWeight << "\n";
     }
     
     double deltaInputWeight;
@@ -60,14 +61,14 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
     double internalErrorInputPartial;
     double internalErrorForgetPartial;
     
-    for(int i = 0; i != inputGateWeights.size(); ++i){
+    for(int i = 0; i != inputGateWeights->size(); ++i){
         calcInternalErrorGatePartials(&internalErrorInputPartial, &internalErrorForgetPartial, prevLayer, nextLayer, this, blockPosition, i);
         deltaInputWeight = alpha * internalErrorInputPartial;
 //        std::cout << "dIW: " << deltaInputWeight << std::endl;
-        inputGateWeights[i] += deltaInputWeight;
+        inputGateWeights->at(i) += deltaInputWeight;
         deltaForgetWeight = alpha * internalErrorForgetPartial;
 //        std::cout << "dFW: " << deltaForgetWeight << std::endl;
-        forgetGateWeights[i] += deltaForgetWeight;
+        forgetGateWeights->at(i) += deltaForgetWeight;
     }
     
     long cellPosition;
@@ -114,12 +115,15 @@ void MemoryBlock::flushState(){
 
 void MemoryBlock::printUnit(){
     std::cout << "Wf: ";
-    utility::printVector(inputGateWeights);
+    utility::printVector(*inputGateWeights);
     std::cout << "; Wf: ";
-    utility::printVector(forgetGateWeights);
+    utility::printVector(*forgetGateWeights);
     std::cout << "; Wo: ";
-    utility::printVector(outputGateWeights);
+    utility::printVector(*outputGateWeights);
+
+    std::cout << std::endl;
     
+    std::cout << "Delta: " << delta;
     std::cout << std::endl;
     
     for(int i = 0; i != memoryCells.size(); ++i){
@@ -129,8 +133,8 @@ void MemoryBlock::printUnit(){
     }
 }
 
-std::vector<double>* MemoryBlock::getOutput() const{
-    std::vector<double>* output = new std::vector<double>();
+std::shared_ptr<std::vector<double>> MemoryBlock::getOutput() const{
+    std::shared_ptr<std::vector<double>> output = std::make_shared<std::vector<double>>();
     for(std::shared_ptr<MemoryCell> memoryCell : memoryCells){
         output->push_back(memoryCell->getOutput());
     }
@@ -138,5 +142,5 @@ std::vector<double>* MemoryBlock::getOutput() const{
 }
 
 double MemoryBlock::getOutputWeightToCellInPrevLayer(long cellPosition){
-    return outputGateWeights[cellPosition];
+    return outputGateWeights->at(cellPosition);
 }

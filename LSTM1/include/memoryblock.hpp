@@ -27,11 +27,11 @@ public:
     void flushState();
     void printUnit();
     
-    std::vector<std::shared_ptr<MemoryCell>>* getMemoryCells() { return &memoryCells; }
-    std::vector<double>* getInputGateWeights() { return &inputGateWeights; }
-    std::vector<double>* getForgetGateWeights() { return &forgetGateWeights; }
-    std::vector<double>* getOutputGateWeights() { return &outputGateWeights; }
-    std::vector<double>* getOutput() const;
+    std::vector<std::shared_ptr<MemoryCell>> getMemoryCells() { return memoryCells; }
+    std::shared_ptr<std::vector<double>> getInputGateWeights() { return inputGateWeights; }
+    std::shared_ptr<std::vector<double>> getForgetGateWeights() { return forgetGateWeights; }
+    std::shared_ptr<std::vector<double>> getOutputGateWeights() { return outputGateWeights; }
+    std::shared_ptr<std::vector<double>> getOutput() const;
     double getDelta() { return delta; }
     double getOutputWeightToCellInPrevLayer(long);
     double getInputNet() { return inputNet; }
@@ -43,9 +43,9 @@ private:
     double alpha;
     std::vector<std::shared_ptr<MemoryCell>> memoryCells;
     
-    std::vector<double> inputGateWeights;
-    std::vector<double> forgetGateWeights;
-    std::vector<double> outputGateWeights;
+    std::shared_ptr<std::vector<double>> inputGateWeights;
+    std::shared_ptr<std::vector<double>> forgetGateWeights;
+    std::shared_ptr<std::vector<double>> outputGateWeights;
     
     double inputNet;
     double inputGate;

@@ -63,7 +63,7 @@ public:
     double transformFromPrice(double);
     double transformToPrice(double);
 private:
-    double radius = 1;
+    double radius = 0.5;
     double center = 0;
     
     double translationCoeff;

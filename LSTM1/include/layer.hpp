@@ -17,6 +17,7 @@ public:
     Layer();
     Layer(int, double);
     Layer(int, int, double, long);
+    ~Layer();
     
     void forwardpass(const std::vector<double>&);
     void forwardpass(const std::shared_ptr<Layer>);
@@ -26,8 +27,8 @@ public:
     void flushState();
     void printLayer();
     
-    std::vector<double>* getOutput() const;
-    std::vector<std::shared_ptr<Unit>>* getUnits() { return &units; }
+    std::shared_ptr<std::vector<double>> getOutput() const;
+    std::shared_ptr<std::vector<std::shared_ptr<Unit>>> getUnits() { return std::make_shared<std::vector<std::shared_ptr<Unit>>>(units); }
 private:
     std::vector<std::shared_ptr<Unit>> units;
 };
