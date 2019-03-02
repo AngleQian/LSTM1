@@ -27,8 +27,20 @@ namespace utility {
     double dg(double);
     double h(double);
     double dh(double);
-    double nofunc(double x);
-    double dnofunc(double x);
+    double nofunc(double);
+    double dnofunc(double);
+    double relu(double);
+    double drelu(double);
+    double leakyrelu(double);
+    double dleakyrelu(double);
+    double tanh(double);
+    double dtanh(double);
+    
+    double getError(double, double);
+    double getAbsoluteError(double, double);
+    double getRelativeError(double, double);
+    
+    double clipping(double);
     
     template<typename T>
     void printVector(const T& t){
@@ -74,6 +86,16 @@ class NoTransform : public Transform {
 public:
     double transformFromPrice(double x) { return x; }
     double transformToPrice(double x) { return x; }
+};
+
+class TransformStandardize: public Transform {
+public:
+    TransformStandardize(double, double);
+    double transformFromPrice(double);
+    double transformToPrice(double);
+private:
+    double mean;
+    double sd;
 };
 
 #endif /* utility_hpp */

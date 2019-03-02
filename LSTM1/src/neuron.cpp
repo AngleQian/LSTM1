@@ -32,8 +32,7 @@ void Neuron::backwardpass(const std::shared_ptr<Layer> prevLayer, double externa
     
     for(int i = 0; i != weights->size(); ++i){
         double deltaWeight = alpha * delta * prevLayer->getOutput()->at(i);
-//        std::cout << "dkW: " << deltaWeight << std::endl;
-        weights->at(i) += deltaWeight;
+        weights->at(i) += utility::clipping(deltaWeight);
     }
 }
 
@@ -42,13 +41,15 @@ void Neuron::calcDelta(double externalError){
 }
 
 void Neuron::flushState(){
-    
+
 }
 
 void Neuron::printUnit(){
     std::cout << "W: ";
     utility::printVector(*weights);
+    std::cout << "; net: " << net;
     std::cout << "; y: " << output;
+    std::cout << "; delta: " << delta;
 }
 
 std::shared_ptr<std::vector<double>> Neuron::getOutput() const{

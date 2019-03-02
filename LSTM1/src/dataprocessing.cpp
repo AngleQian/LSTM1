@@ -79,3 +79,18 @@ double dataprocessing::getTableColumnMin(std::vector<std::vector<double> > table
     return min;
 }
 
+double dataprocessing::getTableColumnSd(std::vector<std::vector<double> > table, int columnNumber){
+    double sum = 0;
+    double average = getTableColumnAverage(table, columnNumber);
+    int count = 0;
+    
+    for(std::vector<double> row: table) {
+        sum += pow((row[columnNumber] - average), 2);
+        ++count;
+    }
+    
+    double variance = (double) sum / count;
+    
+    return pow(variance, 0.5);
+}
+

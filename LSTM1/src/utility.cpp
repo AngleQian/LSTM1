@@ -9,27 +9,27 @@
 #include "../include/utility.hpp"
 
 double utility::f(double x){
-    return 1/(1+exp(-x));
+    return (double) 1 / (1+exp(-1*x));
 }
 
 double utility::df(double x){
-    return f(x)*(1-f(x));
+    return (double) f(x) * (1-f(x));
 }
 
 double utility::g(double x){
-    return 4/(1+exp(-x)) - 2;
+    return (double) 4 / (1 + exp(-1*x)) - 2;
 }
 
 double utility::dg(double x){
-    return 4 * df(x);
+    return (double) 4 * df(x);
 }
 
 double utility::h(double x){
-    return 2/(1+exp(-x)) - 1;
+    return (double) 2 / (1+exp(-1*x)) - 1;
 }
 
 double utility::dh(double x){
-    return 2 * df(x);
+    return (double) 2 * df(x);
 }
 
 double utility::nofunc(double x){
@@ -38,6 +38,54 @@ double utility::nofunc(double x){
 
 double utility::dnofunc(double x){
     return 1.0;
+}
+
+double utility::relu(double x){
+    return x > 0 ? x : 0;
+}
+
+double utility::drelu(double x){
+    return x > 0 ? 1 : 0;
+}
+
+double utility::leakyrelu(double x){
+    return x > 0 ? x : 0.01 * x;
+}
+
+double utility::dleakyrelu(double x){
+    return x > 0 ? 1 : 0.01;
+}
+
+
+double utility::tanh(double x) {
+    return (double) 2 / (1 + exp(-2 * x)) - 1;
+}
+
+double utility::dtanh(double x) {
+    return (double) 1 - pow(tanh(x), 2.0);
+}
+
+double utility::getError(double testValue, double truthValue) {
+    return getAbsoluteError(testValue, truthValue);
+}
+
+double utility::getAbsoluteError(double testValue, double truthValue) {
+    return abs((double) testValue - truthValue);
+}
+
+double utility::getRelativeError(double testValue, double truthValue) {
+    return abs((double) testValue - truthValue) / truthValue;
+}
+
+double utility::clipping(double x){
+    if (x > 1) {
+        return 1;
+    }
+    
+    if (x < -1) {
+        return -1;
+    }
+    return x;
 }
 
 double utility::getRandomWeight(double a, double b){
@@ -59,5 +107,18 @@ double TransformLinear::transformFromPrice(double price){
 
 double TransformLinear::transformToPrice(double x){
     return (x - translationCoeff) / squashCoeff;
+}
+
+TransformStandardize::TransformStandardize(double mean, double sd){
+    this->mean = mean;
+    this->sd = sd;
+}
+
+double TransformStandardize::transformFromPrice(double price) {
+    return (double) (price - mean) / ((double) sd);
+}
+
+double TransformStandardize::transformToPrice(double x) {
+    return (double) x * sd + mean;
 }
 

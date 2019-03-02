@@ -63,14 +63,27 @@ void Network::weightInit(int cellsPerBlock){
         for(int j = 0; j != hiddenLayerUnits->size(); ++j){
             std::shared_ptr<Unit> unit = hiddenLayerUnits->at(j);
             std::shared_ptr<MemoryBlock> memoryBlock = std::dynamic_pointer_cast<MemoryBlock>(unit);
+            
+//            int x = 1;
+//
+//            for(int k = 0; k != noOfSourceUnits; ++k){
+//                memoryBlock->getInputGateWeights()->push_back(utility::getRandomWeight(0, x));
+//                memoryBlock->getOutputGateWeights()->push_back(utility::getRandomWeight(0, x));
+//                memoryBlock->getForgetGateWeights()->push_back(utility::getRandomWeight(-1 * x, 0));
+//
+//                for(std::shared_ptr<MemoryCell> memoryCell : memoryBlock->getMemoryCells()){
+//                    memoryCell->getCellStateWeights()->push_back(utility::getRandomWeight(-1 * x, x));
+//                }
+//            }
 
+            
             for(int k = 0; k != noOfSourceUnits; ++k){
-                memoryBlock->getInputGateWeights()->push_back(utility::getRandomWeight(-5, 0));
-                memoryBlock->getOutputGateWeights()->push_back(utility::getRandomWeight(-5, 0));
-                memoryBlock->getForgetGateWeights()->push_back(utility::getRandomWeight(0, 5));
-
+                memoryBlock->getInputGateWeights()->push_back(0.5);
+                memoryBlock->getOutputGateWeights()->push_back(0.5);
+                memoryBlock->getForgetGateWeights()->push_back(-0.5);
+                
                 for(std::shared_ptr<MemoryCell> memoryCell : memoryBlock->getMemoryCells()){
-                    memoryCell->getCellStateWeights()->push_back(utility::getRandomWeight(-5, 0));
+                    memoryCell->getCellStateWeights()->push_back(0.5);
                 }
             }
         }
@@ -84,12 +97,14 @@ void Network::weightInit(int cellsPerBlock){
         std::shared_ptr<Unit> unit = outputLayerUnits->at(i);
         std::shared_ptr<Neuron> neuron = std::dynamic_pointer_cast<Neuron>(unit);
         for(int j = 0; j != noOfSourceUnits; j++){
-            neuron->getWeights()->push_back(utility::getRandomWeight(-5, 5));
+//            neuron->getWeights()->push_back(utility::getRandomWeight(-1, 1));
+            neuron->getWeights()->push_back(0.5);
         }
     }
 }
 
 void Network::train(){
+//    printNetwork();
     std::ofstream file1;
     std::ofstream file2;
     std::string directory = dataprocessing::baseDirectory + "output/" + "trainingOutput.txt";
@@ -104,33 +119,31 @@ void Network::train(){
     std::vector<double> outputs;
 
     for(int i = 0; i != trainingOutputs.size(); ++i){
-        if(i < 3){
-            printNetwork();
-        }
         inputs = trainingInputs[i];
+        if (i == 0) {
+            printNetwork();
+            std::cout << std::endl << "inputs: ";
+            utility::printVector(inputs);
+            std::cout << std::endl;
+        }
         outputs = forwardpass(inputs);
         targetOutputs = trainingOutputs[i];
-//        error = (double) abs(backwardpass(targetOutputs, outputs)) / targetOutputs[0];
-        error = (double) abs(backwardpass(targetOutputs, outputs)) / 1.0;
+        error = (double) abs(backwardpass(targetOutputs, outputs));
+        if (i == 0) {
+            printNetwork();
+            std::cout << std::endl << "outputs: ";
+            utility::printVector(outputs);
+            std::cout << std::endl << "targetoutputs: ";
+            utility::printVector(targetOutputs);
+        }
         sumOfError += error;
 
-//        std::cout << "Training cycle " << i+1 << ": " << std::endl;
-//        std::cout << "Input: ";
-//        utility::printVector(inputs);
-//        std::cout << std::endl << "Target output: ";
-//        utility::printVector(targetOutputs);
-//        std::cout << std::endl << "Output: ";
-//        utility::printVector(outputs);
-//        std::cout << std::endl << "Error: " << error;
-//        std::cout << std::endl << std::endl;
-
-        file1 << inputs[0] << "," << targetOutputs[0] << "," << outputs[0] << "\n";
+        file1 << transform->transformFromPrice(inputs[0]) << "," << transform->transformFromPrice(targetOutputs[0]) << "," << transform->transformFromPrice(outputs[0]) << "\n";
         file2 << error << "\n";
     }
-//    std::cout << std::endl;
-//    std::cout << "Avg error during training: " << (double) sumOfError / (trainingInputs.size()-1) << std::endl;
     file1.close();
     file2.close();
+//    printNetwork();
 }
 
 double Network::validate(){
@@ -141,7 +154,7 @@ double Network::validate(){
     file1.open(directory);
 //    file2.open(directory2);
 
-//    flushState();
+    flushState();
 
     double error;
     double sumOfError = 0;
@@ -153,30 +166,17 @@ double Network::validate(){
         inputs = validationInputs[i];
         outputs = forwardpass(inputs);
         targetOutputs = validationOutputs[i];
-
-//        error = (double) abs(targetOutputs[0] - outputs[0]) / targetOutputs[0];
-        error = (double) abs(targetOutputs[0] - outputs[0]) / 1.0;
+        
+        error = utility::getError(outputs[0], targetOutputs[0]);
         sumOfError += error;
 
-//        std::cout << "Validation cycle " << i+1 << ": " << std::endl;
-//        std::cout << "Input: ";
-//        utility::printVector(inputs);
-//        std::cout << std::endl << "Target output: ";
-//        utility::printVector(targetOutputs);
-//        std::cout << std::endl << "Output: ";
-//        utility::printVector(outputs);
-//        std::cout << std::endl << "Error: " << error;
-//        std::cout << std::endl << std::endl;
-
-        file1 << inputs[0] << "," << targetOutputs[0] << "," << outputs[0] << "\n";
-//        file2 << error << "\n";
+        file1 << transform->transformFromPrice(inputs[0]) << "," << transform->transformFromPrice(targetOutputs[0]) << "," << transform->transformFromPrice(outputs[0]) << "\n";
     }
-//    std::cout << std::endl;
-//    std::cout << "Avg error during validation: " << (double) sumOfError / (validationInputs.size()-1) << std::endl;
+
     file1.close();
 //    file2.close();
 
-    return (double) sumOfError / (validationInputs.size()-1);
+    return (double) sumOfError / (validationInputs.size());
 }
 
 std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
@@ -212,7 +212,7 @@ std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
 double Network::backwardpass(const std::vector<double>& targetOutput, const std::vector<double>& output){
     std::vector<double> externalError = std::vector<double>();
     for(int i = 0; i != targetOutput.size(); ++i){
-       externalError.push_back(transform->transformFromPrice(targetOutput[i]) - transform->transformFromPrice(output[i]));
+       externalError.push_back(transform->transformFromPrice(targetOutput[i] - output[i]));
     }
 
     std::shared_ptr<Layer> outputLayer = layers[layers.size()-1];
@@ -228,6 +228,8 @@ double Network::backwardpass(const std::vector<double>& targetOutput, const std:
         prevLayer = layers[i-1];
         hiddenLayer->backwardpass(prevLayer, nextLayer);
     }
+    
+    
 
     return externalError[0];
 }

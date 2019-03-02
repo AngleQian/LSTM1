@@ -51,8 +51,8 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
     for(int i = 0; i != outputGateWeights->size(); ++i){
         deltaOutputWeight = alpha * delta * prevLayer->getOutput()->at(i);
 //      std::cout << "dOW: " << deltaOutputWeight << std::endl;
-        outputGateWeights->at(i) += deltaOutputWeight;
-        file << deltaOutputWeight << "\n";
+        outputGateWeights->at(i) += utility::clipping(deltaOutputWeight);
+//       file << deltaOutputWeight << "\n";
     }
     
     double deltaInputWeight;
@@ -65,10 +65,10 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
         calcInternalErrorGatePartials(&internalErrorInputPartial, &internalErrorForgetPartial, prevLayer, nextLayer, this, blockPosition, i);
         deltaInputWeight = alpha * internalErrorInputPartial;
 //        std::cout << "dIW: " << deltaInputWeight << std::endl;
-        inputGateWeights->at(i) += deltaInputWeight;
+        inputGateWeights->at(i) += utility::clipping(deltaInputWeight);
         deltaForgetWeight = alpha * internalErrorForgetPartial;
 //        std::cout << "dFW: " << deltaForgetWeight << std::endl;
-        forgetGateWeights->at(i) += deltaForgetWeight;
+        forgetGateWeights->at(i) += utility::clipping(deltaForgetWeight);
     }
     
     long cellPosition;
@@ -80,14 +80,14 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
 }
 
 void MemoryBlock::calcDelta(const std::shared_ptr<Layer> nextLayer, int blockPosition){
-    double factor = utility::df(outputNet);
     delta = 0;
     long cellPosition;
     for(int i = 0; i != memoryCells.size(); ++i){
         cellPosition = blockPosition * memoryCells.size() + i;
         memoryCells[i]->calcDelta(nextLayer, cellPosition);
-        delta += factor * memoryCells[i]->getDelta();
+        delta += memoryCells[i]->getDelta();
     }
+    delta *= utility::df(outputNet);
 }
 
 void MemoryBlock::calcInternalErrorGatePartials(double* internalErrorInputPartial, double* internalErrorForgetPartial, const std::shared_ptr<Layer> prevLayer, const std::shared_ptr<Layer> nextLayer, MemoryBlock * memoryBlock, int blockPosition, int sourceUnitIndex){
@@ -114,12 +114,16 @@ void MemoryBlock::flushState(){
 }
 
 void MemoryBlock::printUnit(){
-    std::cout << "Wf: ";
+    std::cout << "Wi: ";
     utility::printVector(*inputGateWeights);
     std::cout << "; Wf: ";
     utility::printVector(*forgetGateWeights);
     std::cout << "; Wo: ";
     utility::printVector(*outputGateWeights);
+    std::cout << "; Yi: " << inputGate;
+    std::cout << "; Yf: " << forgetGate;
+    std::cout << "; Yo: " << outputGate;
+    
 
     std::cout << std::endl;
     

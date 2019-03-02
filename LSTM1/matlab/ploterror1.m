@@ -1,4 +1,4 @@
-clear; clc;
+clear; clc; cla(gca);
 
 data = csvread("trainingError.txt");
 %data = csvread("validationError.txt");
