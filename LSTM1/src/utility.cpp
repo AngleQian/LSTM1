@@ -95,6 +95,14 @@ double utility::getRandomWeight(double a, double b){
     return weightDist(gen);
 }
 
+double utility::getXavierWeight(double N) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    double sd = sqrt((double) 1 / N);
+    std::normal_distribution<double> distribution(0, sd);
+    return distribution(gen);
+}
+
 TransformLinear::TransformLinear(double average, double rangeMin, double rangeMax){
     double maxDiff = (average-rangeMin) >= (rangeMax-average) ? (average-rangeMin)  : (rangeMax-average);
     squashCoeff = radius/maxDiff;

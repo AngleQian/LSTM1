@@ -1,11 +1,13 @@
 cla(gca);
 
-%data = csvread('trainingOutput.txt');
+% data = csvread('trainingOutput.txt');
 data = csvread('validationOutput.txt');
 
-inputprice = data(1:(end-0), 1);
-trueprice = data(1:(end-0), 2);
+inputprice = data(1:(end), 1);
+trueprice = data(1:(end), 2);
 outputprice = data(1:end, 3);
+
+
 
 x = linspace(1, size(trueprice, 1), size(trueprice, 1));
 

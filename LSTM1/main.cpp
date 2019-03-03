@@ -49,9 +49,6 @@ int main(int argc, const char * argv[]) {
     prepareSineTest();
     restateTesting();
     testSine();
-    
-    std::cout << "df(0.0211736) " << utility::df(0.0211736);
-    
 }
 
 void test02() {
@@ -175,8 +172,8 @@ void prepareSineTest() {
     std::vector<double> inputRow = std::vector<double>();
     std::vector<double> outputRow = std::vector<double>();
     for(double i = 0; i <= 500; i += 0.1) {
-        inputRow.push_back(0.5*sin(i));
-        outputRow.push_back(0.5*sin((double) i + 10));
+        inputRow.push_back(0.5*cos(i));
+        outputRow.push_back(0.5*cos((double) i + 2));
         inputTable.push_back(inputRow);
         outputTable.push_back(outputRow);
         inputRow.clear();
@@ -197,7 +194,7 @@ void prepareSineTest() {
     
     transform = new NoTransform();
     
-    topology = {1, 2, 2, 1};
+    topology = {1, 5, 1};
     cellsPerBlock = 2;
 }
 

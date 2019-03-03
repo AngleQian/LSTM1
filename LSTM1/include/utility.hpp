@@ -61,6 +61,7 @@ namespace utility {
     }
 
     double getRandomWeight(double, double);
+    double getXavierWeight(double);
 }
 
 class Transform {

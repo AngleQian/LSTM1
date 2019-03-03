@@ -63,29 +63,27 @@ void Network::weightInit(int cellsPerBlock){
         for(int j = 0; j != hiddenLayerUnits->size(); ++j){
             std::shared_ptr<Unit> unit = hiddenLayerUnits->at(j);
             std::shared_ptr<MemoryBlock> memoryBlock = std::dynamic_pointer_cast<MemoryBlock>(unit);
-            
-//            int x = 1;
-//
-//            for(int k = 0; k != noOfSourceUnits; ++k){
-//                memoryBlock->getInputGateWeights()->push_back(utility::getRandomWeight(0, x));
-//                memoryBlock->getOutputGateWeights()->push_back(utility::getRandomWeight(0, x));
-//                memoryBlock->getForgetGateWeights()->push_back(utility::getRandomWeight(-1 * x, 0));
-//
-//                for(std::shared_ptr<MemoryCell> memoryCell : memoryBlock->getMemoryCells()){
-//                    memoryCell->getCellStateWeights()->push_back(utility::getRandomWeight(-1 * x, x));
-//                }
-//            }
 
-            
             for(int k = 0; k != noOfSourceUnits; ++k){
-                memoryBlock->getInputGateWeights()->push_back(0.5);
-                memoryBlock->getOutputGateWeights()->push_back(0.5);
-                memoryBlock->getForgetGateWeights()->push_back(-0.5);
-                
+                memoryBlock->getInputGateWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
+                memoryBlock->getOutputGateWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
+                memoryBlock->getForgetGateWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
+
                 for(std::shared_ptr<MemoryCell> memoryCell : memoryBlock->getMemoryCells()){
-                    memoryCell->getCellStateWeights()->push_back(0.5);
+                    memoryCell->getCellStateWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
                 }
             }
+
+            
+//            for(int k = 0; k != noOfSourceUnits; ++k){
+//                memoryBlock->getInputGateWeights()->push_back(0.5);
+//                memoryBlock->getOutputGateWeights()->push_back(0.5);
+//                memoryBlock->getForgetGateWeights()->push_back(-0.5);
+//
+//                for(std::shared_ptr<MemoryCell> memoryCell : memoryBlock->getMemoryCells()){
+//                    memoryCell->getCellStateWeights()->push_back(0.5);
+//                }
+//            }
         }
 
         noOfSourceUnits = hiddenLayerUnits->size() * cellsPerBlock;
@@ -97,8 +95,8 @@ void Network::weightInit(int cellsPerBlock){
         std::shared_ptr<Unit> unit = outputLayerUnits->at(i);
         std::shared_ptr<Neuron> neuron = std::dynamic_pointer_cast<Neuron>(unit);
         for(int j = 0; j != noOfSourceUnits; j++){
-//            neuron->getWeights()->push_back(utility::getRandomWeight(-1, 1));
-            neuron->getWeights()->push_back(0.5);
+            neuron->getWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
+//            neuron->getWeights()->push_back(0.5);
         }
     }
 }
@@ -129,13 +127,13 @@ void Network::train(){
         outputs = forwardpass(inputs);
         targetOutputs = trainingOutputs[i];
         error = (double) abs(backwardpass(targetOutputs, outputs));
-        if (i == 0) {
-            printNetwork();
-            std::cout << std::endl << "outputs: ";
-            utility::printVector(outputs);
-            std::cout << std::endl << "targetoutputs: ";
-            utility::printVector(targetOutputs);
-        }
+//        if (i == 0) {
+//            printNetwork();
+//            std::cout << std::endl << "outputs: ";
+//            utility::printVector(outputs);
+//            std::cout << std::endl << "targetoutputs: ";
+//            utility::printVector(targetOutputs);
+//        }
         sumOfError += error;
 
         file1 << transform->transformFromPrice(inputs[0]) << "," << transform->transformFromPrice(targetOutputs[0]) << "," << transform->transformFromPrice(outputs[0]) << "\n";
@@ -143,7 +141,7 @@ void Network::train(){
     }
     file1.close();
     file2.close();
-//    printNetwork();
+    printNetwork();
 }
 
 double Network::validate(){
