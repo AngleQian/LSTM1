@@ -173,7 +173,7 @@ void prepareSineTest() {
     std::vector<double> outputRow = std::vector<double>();
     for(double i = 0; i <= 500; i += 0.1) {
         inputRow.push_back(0.5*cos(i));
-        outputRow.push_back(0.5*cos((double) i + 2));
+        outputRow.push_back(0.5*cos((double) i + 3.14));
         inputTable.push_back(inputRow);
         outputTable.push_back(outputRow);
         inputRow.clear();
@@ -208,7 +208,7 @@ void testSine() {
     //    for(double a = 0.2; a <= 20; a += 0.2) {
     //        test(5, transform, topology, cellsPerBlock, a, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
     //    }
-    test(1, transform, topology, cellsPerBlock, 10, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
+    test(10, transform, topology, cellsPerBlock, 1, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
 }
 
 

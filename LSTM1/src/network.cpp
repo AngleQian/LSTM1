@@ -118,12 +118,12 @@ void Network::train(){
 
     for(int i = 0; i != trainingOutputs.size(); ++i){
         inputs = trainingInputs[i];
-        if (i == 0) {
-            printNetwork();
-            std::cout << std::endl << "inputs: ";
-            utility::printVector(inputs);
-            std::cout << std::endl;
-        }
+//        if (i == 0) {
+//            printNetwork();
+//            std::cout << std::endl << "inputs: ";
+//            utility::printVector(inputs);
+//            std::cout << std::endl;
+//        }
         outputs = forwardpass(inputs);
         targetOutputs = trainingOutputs[i];
         error = (double) abs(backwardpass(targetOutputs, outputs));
@@ -141,7 +141,7 @@ void Network::train(){
     }
     file1.close();
     file2.close();
-    printNetwork();
+//    printNetwork();
 }
 
 double Network::validate(){
