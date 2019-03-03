@@ -194,8 +194,8 @@ void prepareSineTest() {
     
     transform = new NoTransform();
     
-    topology = {1, 5, 1};
-    cellsPerBlock = 2;
+    topology = {1, 3, 1};
+    cellsPerBlock = 1;
 }
 
 void testSine() {

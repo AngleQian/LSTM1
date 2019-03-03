@@ -126,7 +126,7 @@ void Network::train(){
 //        }
         outputs = forwardpass(inputs);
         targetOutputs = trainingOutputs[i];
-        error = (double) abs(backwardpass(targetOutputs, outputs));
+        error = (double) backwardpass(targetOutputs, outputs);
 //        if (i == 0) {
 //            printNetwork();
 //            std::cout << std::endl << "outputs: ";

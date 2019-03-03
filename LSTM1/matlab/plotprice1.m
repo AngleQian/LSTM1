@@ -5,7 +5,7 @@ data = csvread('validationOutput.txt');
 
 inputprice = data(1:(end), 1);
 trueprice = data(1:(end), 2);
-outputprice = data(1:end, 3).*1.8;
+outputprice = data(1:end, 3);
 
 
 
