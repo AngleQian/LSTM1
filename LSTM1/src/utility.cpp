@@ -117,9 +117,8 @@ double TransformLinear::transformToPrice(double x){
     return (x - translationCoeff) / squashCoeff;
 }
 
-TransformStandardize::TransformStandardize(double mean, double sd){
-    this->mean = mean;
-    this->sd = sd;
+TransformStandardize::TransformStandardize(double mean, double sd): mean(mean), sd(sd) {
+    
 }
 
 double TransformStandardize::transformFromPrice(double price) {
@@ -128,5 +127,18 @@ double TransformStandardize::transformFromPrice(double price) {
 
 double TransformStandardize::transformToPrice(double x) {
     return (double) x * sd + mean;
+}
+
+TransformMinMax::TransformMinMax(double min, double max): min(min), max(max) {
+    a = (double) (newMax - newMin) / (max - min);
+    b = newMax - a * max;
+}
+
+double TransformMinMax::transformFromPrice(double price){
+    return a * price - b;
+}
+
+double TransformMinMax::transformToPrice(double x){
+    return (double) (x + b) / a;
 }
 

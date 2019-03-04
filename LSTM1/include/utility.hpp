@@ -99,4 +99,19 @@ private:
     double sd;
 };
 
+
+class TransformMinMax: public Transform {
+public:
+    TransformMinMax(double, double);
+    double transformFromPrice(double);
+    double transformToPrice(double);
+private:
+    double min;
+    double max;
+    double a;
+    double b;
+    double newMax = 0.5;
+    double newMin = -0.5;
+};
+
 #endif /* utility_hpp */

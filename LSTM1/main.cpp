@@ -17,12 +17,15 @@
 std::vector< std::vector<std::string> > rawTable;
 std::vector< std::vector<double> > processedTable;
 
+std::vector<double> aValues{ 0.01, 0.03, 0.05, 0.07, 0.09, 0.1, 0.3, 0.5, 0.7, 0.9, 1, 3, 5, 7, 9 };
+
 void init();
 void prepareData();
 void prepareTest02();
 void test02();
 void test(int, Transform*, std::vector<int>, int, double, std::vector< std::vector<double> >, std::vector< std::vector<double> >, std::vector< std::vector<double> > , std::vector< std::vector<double> >);
 void restateTesting();
+void meanTesting();
 void prepareSineTest();
 void testSine();
 
@@ -40,15 +43,15 @@ namespace NetworkConfig {
 int main(int argc, const char * argv[]) {
     init();
     
-    
-    
 //    prepareData();
 //    prepareTest02();
 //    test02();
-    
+
     prepareSineTest();
-    restateTesting();
     testSine();
+    
+    restateTesting();
+    meanTesting();
 }
 
 void test02() {
@@ -58,10 +61,10 @@ void test02() {
     
     using namespace NetworkConfig;
     
-//    for(double a = 0.2; a <= 20; a += 0.2) {
-//        test(5, transform, topology, cellsPerBlock, a, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
+//    for(double aValue : aValues) {
+//        test(10, transform, topology, cellsPerBlock, aValue, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
 //    }
-    test(10, transform, topology, cellsPerBlock, 10, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
+    test(10, transform, topology, cellsPerBlock, 1, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
 }
 
 
@@ -73,19 +76,19 @@ void prepareTest02() {
     
     std::vector<double> inputRow = std::vector<double>();
     for(int i = days; i < size - days; ++i) {
-        inputRow.push_back((double) (processedTable[i][0] - processedTable[i - days][0]) / processedTable[i - days][0]);
+        inputRow.push_back((double) (processedTable[i][0] - processedTable[i - days][0]) * 5.0 / processedTable[i - days][0]);
         inputTable.push_back(inputRow);
         inputRow.clear();
     }
     
     std::vector<double> outputRow = std::vector<double>();
     for(int i = days; i < size - days; ++i) {
-        outputRow.push_back((double) (processedTable[i + days][0] - processedTable[i][0]) / processedTable[i][0]);
+        outputRow.push_back((double) (processedTable[i + days][0] - processedTable[i][0]) * 5.0 / processedTable[i][0]);
         outputTable.push_back(outputRow);
         outputRow.clear();
     }
     
-    unsigned long divider = 0.8 * size;
+    unsigned long divider = 0.7 * size;
     
     using namespace NetworkConfig;
     
@@ -98,13 +101,17 @@ void prepareTest02() {
     std::cout << "Training Period: " << rawTable[days][0] << " - " << rawTable[divider][0]  << std::endl;
     std::cout << "Validation Period: " << rawTable[divider + 1][0] << " - " << rawTable[rawTable.size() - 1 - days][0] << std::endl;
     
-    double average = dataprocessing::getTableColumnAverage(inputTable, 0);
-    double sd = dataprocessing::getTableColumnSd(inputTable, 0);
+    double average = dataprocessing::getTableColumnAverage(trainingInputs, 0);
+    double sd = dataprocessing::getTableColumnSd(trainingInputs, 0);
+    double min = dataprocessing::getTableColumnMin(trainingInputs, 0);
+    double max = dataprocessing::getTableColumnMax(trainingInputs, 0);
     
-    transform = new TransformStandardize(average, sd);
+//    transform = new TransformStandardize(average, sd);
+//    transform = new TransformLinear(0, min, max);
+    transform = new NoTransform();
     
     topology = {1, 5, 1};
-    cellsPerBlock = 1;
+    cellsPerBlock = 3;
 }
 
 void prepareData() {
@@ -133,26 +140,46 @@ void restateTesting() {
     std::cout << "Prediction via restating, mean absolute error: " << sumOfError / validationOutputs.size() << std::endl;
 }
 
+void meanTesting() {
+    using namespace NetworkConfig;
+    
+    double sumOfError = 0;
+    double mean = dataprocessing::getTableColumnAverage(validationOutputs, 0);
+    
+    for(std::vector<double> output: validationOutputs) {
+        sumOfError = (double) abs(0 - output[0]);
+    }
+    
+    std::cout << "Prediction via stating 0, mean absolute error: " << sumOfError / validationOutputs.size() << std::endl;
+}
+
 void test(int repetitions, Transform* transform, std::vector<int> topology, int cellsPerBlock, double alpha,
           std::vector< std::vector<double> > trainingInputs,
           std::vector< std::vector<double> > trainingOutputs, std::vector< std::vector<double> > validationInputs, std::vector< std::vector<double> > validationOutputs){
     std::ofstream file;
-    std::string directory = "/Users/angleqian/Drive Sync/Extended Essay/LSTM1/LSTM1/output/param.txt";
+    std::string directory = "/Users/angleqian/Drive Sync/Extended Essay/LSTM1/LSTM1/output/testOutput1,1.txt";
     file.open(directory, std::ios_base::app);
     
     double sumOfError = 0;
+    double sumOfCorrectDirectionPercentage = 0;
     
     std::cout << std::endl << std::endl << "Alpha: " << alpha << std::endl;
+    
+    file << alpha;
     
     for(int i = 0; i != repetitions; ++i){
         Network network = Network(transform, topology, cellsPerBlock, alpha, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
         network.train();
-        sumOfError += network.validate();
+        std::vector<double> returnValue = network.validate();
+        file <<  "," << returnValue[0];
+        sumOfError += returnValue[0];
+        sumOfCorrectDirectionPercentage += returnValue[1];
         std::cout << i+1 << " ";
     }
     
-    std::cout << "Average validation error: " << (double) sumOfError / repetitions << std::endl << std::endl;
-    file << alpha << "," << (double) sumOfError / repetitions << "\n";
+    std::cout << std::endl << "Average % of correct direction prediction: " << (double) sumOfCorrectDirectionPercentage / repetitions;
+    std::cout << std::endl << "Average validation error: " << (double) sumOfError / repetitions << std::endl << std::endl;
+    file << "\n";
 }
 
 void init(){
@@ -171,9 +198,9 @@ void prepareSineTest() {
     
     std::vector<double> inputRow = std::vector<double>();
     std::vector<double> outputRow = std::vector<double>();
-    for(double i = 0; i <= 500; i += 0.1) {
-        inputRow.push_back(0.5*cos(i));
-        outputRow.push_back(0.5*cos((double) i + 3.14));
+    for(double i = 0; i <= 1000; i += 0.1) {
+        inputRow.push_back(0.2*cos(i));
+        outputRow.push_back(0.2*cos((double) i + 3.14));
         inputTable.push_back(inputRow);
         outputTable.push_back(outputRow);
         inputRow.clear();
@@ -194,7 +221,7 @@ void prepareSineTest() {
     
     transform = new NoTransform();
     
-    topology = {1, 3, 1};
+    topology = {1, 2, 1};
     cellsPerBlock = 1;
 }
 
@@ -208,7 +235,7 @@ void testSine() {
     //    for(double a = 0.2; a <= 20; a += 0.2) {
     //        test(5, transform, topology, cellsPerBlock, a, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
     //    }
-    test(10, transform, topology, cellsPerBlock, 1, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
+    test(1, transform, topology, cellsPerBlock, 1, trainingInputs, trainingOutputs, validationInputs, validationOutputs);
 }
 
 

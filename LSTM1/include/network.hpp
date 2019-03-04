@@ -20,7 +20,7 @@ public:
     void train();
     std::vector<double> forwardpass(const std::vector<double>&);
     double backwardpass(const std::vector<double>&, const std::vector<double>&);
-    double validate();
+    std::vector<double> validate();
     
     void flushState();
     void printNetwork();

@@ -5,15 +5,13 @@ data = csvread('validationOutput.txt');
 
 inputprice = data(1:(end), 1);
 trueprice = data(1:(end), 2);
-outputprice = data(1:end, 3);
-
-
+outputprice = data(1:end, 3).*3.93-0.007;
 
 x = linspace(1, size(trueprice, 1), size(trueprice, 1));
 
 plot(x, trueprice, 'Color', 'b'); hold on;
 plot(x, outputprice, 'Color', 'r'); hold on;
-plot(x, inputprice, 'Color', 'g'); hold on;
+% plot(x, inputprice, 'Color', 'g'); hold on;
 
 set(legend, 'interpreter', 'latex', 'FontSize', 18);
 legend('True', 'Predicted', 'Location', 'southeast');

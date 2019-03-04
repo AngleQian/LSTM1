@@ -126,7 +126,7 @@ void Network::train(){
 //        }
         outputs = forwardpass(inputs);
         targetOutputs = trainingOutputs[i];
-        error = (double) backwardpass(targetOutputs, outputs);
+        error = (double) abs(backwardpass(targetOutputs, outputs));
 //        if (i == 0) {
 //            printNetwork();
 //            std::cout << std::endl << "outputs: ";
@@ -144,7 +144,9 @@ void Network::train(){
 //    printNetwork();
 }
 
-double Network::validate(){
+std::vector<double> Network::validate(){
+    std::vector<double> returnVector = std::vector<double>();
+    
     std::ofstream file1;
 //    std::ofstream file2;
     std::string directory = dataprocessing::baseDirectory + "output/" + "validationOutput.txt";
@@ -156,6 +158,7 @@ double Network::validate(){
 
     double error;
     double sumOfError = 0;
+    int correctDirection = 0;
     std::vector<double> inputs;
     std::vector<double> targetOutputs;
     std::vector<double> outputs;
@@ -164,6 +167,10 @@ double Network::validate(){
         inputs = validationInputs[i];
         outputs = forwardpass(inputs);
         targetOutputs = validationOutputs[i];
+        
+        if((outputs[0] * targetOutputs[0]) > 0) {
+            correctDirection++;
+        }
         
         error = utility::getError(outputs[0], targetOutputs[0]);
         sumOfError += error;
@@ -174,7 +181,9 @@ double Network::validate(){
     file1.close();
 //    file2.close();
 
-    return (double) sumOfError / (validationInputs.size());
+    returnVector.push_back((double) sumOfError / validationInputs.size());
+    returnVector.push_back((double) correctDirection / validationInputs.size());
+    return returnVector;
 }
 
 std::vector<double> Network::forwardpass(const std::vector<double>& inputRaw){
@@ -212,6 +221,8 @@ double Network::backwardpass(const std::vector<double>& targetOutput, const std:
     for(int i = 0; i != targetOutput.size(); ++i){
        externalError.push_back(transform->transformFromPrice(targetOutput[i] - output[i]));
     }
+    
+//    std::cout << externalError[0] << std::endl;
 
     std::shared_ptr<Layer> outputLayer = layers[layers.size()-1];
     std::shared_ptr<Layer> prevLayer = layers[layers.size()-2];
@@ -226,8 +237,6 @@ double Network::backwardpass(const std::vector<double>& targetOutput, const std:
         prevLayer = layers[i-1];
         hiddenLayer->backwardpass(prevLayer, nextLayer);
     }
-    
-    
 
     return externalError[0];
 }
