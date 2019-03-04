@@ -29,6 +29,7 @@ public:
     void calcDelta(const std::shared_ptr<Layer>, long);
     void calcInternalErrorGatePartials(double*, double*, const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, MemoryBlock*, long, int);
     void calcInternalError(const std::shared_ptr<Layer>, MemoryBlock*, long);
+    void applyWeightChanges();
     
     void flushState();
     void printCell();
@@ -38,6 +39,7 @@ public:
     double getDelta() { return delta; }
 private:
     double alpha;
+    std::shared_ptr<std::vector<double>> pendingCellStateWeights;
     std::shared_ptr<std::vector<double>> cellStateWeights;
     
     double cellStateNet;

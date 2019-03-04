@@ -11,6 +11,7 @@
 
 Neuron::Neuron(double alpha) : alpha(alpha) {
     weights = std::make_shared<std::vector<double>>();
+    pendingWeights = std::make_shared<std::vector<double>>();
 }
 
 void Neuron::forwardpass(double input){
@@ -32,12 +33,18 @@ void Neuron::backwardpass(const std::shared_ptr<Layer> prevLayer, double externa
     
     for(int i = 0; i != weights->size(); ++i){
         double deltaWeight = alpha * delta * prevLayer->getOutput()->at(i);
-        weights->at(i) += utility::clipping(deltaWeight);
+        pendingWeights->at(i) = weights->at(i) + utility::clipping(deltaWeight);
     }
 }
 
 void Neuron::calcDelta(double externalError){
     delta = utility::dh(net) * externalError;
+}
+
+void Neuron::applyWeightChanges() {
+    for(int i = 0; i != weights->size(); ++i){
+        weights->at(i) = pendingWeights->at(i);
+    }
 }
 
 void Neuron::flushState(){

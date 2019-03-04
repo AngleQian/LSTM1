@@ -23,6 +23,7 @@ public:
     void forwardpass(const std::shared_ptr<Layer>);
     void backwardpass(const std::shared_ptr<Layer>, const std::vector<double>&);
     void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>);
+    void applyWeightChanges();
     
     void flushState();
     void printLayer();

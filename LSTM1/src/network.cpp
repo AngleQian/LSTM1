@@ -52,6 +52,7 @@ void Network::weightInit(int cellsPerBlock){
         std::shared_ptr<Neuron> neuron = std::dynamic_pointer_cast<Neuron>(unit);
         // input neurons directly recieve input vector, so with weight 1
         neuron->getWeights()->push_back(1);
+        neuron->getPendingWeights()->push_back(1);
     }
 
     long noOfSourceUnits = layers[0]->getUnits()->size();
@@ -97,12 +98,13 @@ void Network::weightInit(int cellsPerBlock){
         for(int j = 0; j != noOfSourceUnits; j++){
             neuron->getWeights()->push_back(utility::getXavierWeight(noOfSourceUnits));
 //            neuron->getWeights()->push_back(0.5);
+            neuron->getPendingWeights()->push_back(0);
         }
     }
 }
 
 void Network::train(){
-//    printNetwork();
+    printNetwork();
     std::ofstream file1;
     std::ofstream file2;
     std::string directory = dataprocessing::baseDirectory + "output/" + "trainingOutput.txt";
@@ -141,7 +143,7 @@ void Network::train(){
     }
     file1.close();
     file2.close();
-//    printNetwork();
+    printNetwork();
 }
 
 std::vector<double> Network::validate(){
@@ -237,8 +239,16 @@ double Network::backwardpass(const std::vector<double>& targetOutput, const std:
         prevLayer = layers[i-1];
         hiddenLayer->backwardpass(prevLayer, nextLayer);
     }
+    
+    applyWeightChanges();
 
     return externalError[0];
+}
+
+void Network::applyWeightChanges() {
+    for(std::shared_ptr<Layer> layer : layers) {
+        layer->applyWeightChanges();
+    }
 }
 
 void Network::flushState(){

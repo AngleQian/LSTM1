@@ -23,6 +23,7 @@ public:
     void backwardpass(const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, int);
     void calcDelta(const std::shared_ptr<Layer>, int);
     void calcInternalErrorGatePartials(double*, double*, const std::shared_ptr<Layer>, const std::shared_ptr<Layer>, MemoryBlock*, int, int);
+    void applyWeightChanges();
     
     void flushState();
     void printUnit();
@@ -43,6 +44,9 @@ private:
     double alpha;
     std::vector<std::shared_ptr<MemoryCell>> memoryCells;
     
+    std::shared_ptr<std::vector<double>> pendingInputGateWeights;
+    std::shared_ptr<std::vector<double>> pendingForgetGateWeights;
+    std::shared_ptr<std::vector<double>> pendingOutputGateWeights;
     std::shared_ptr<std::vector<double>> inputGateWeights;
     std::shared_ptr<std::vector<double>> forgetGateWeights;
     std::shared_ptr<std::vector<double>> outputGateWeights;

@@ -5,7 +5,7 @@ data = csvread('validationOutput.txt');
 
 inputprice = data(1:(end), 1);
 trueprice = data(1:(end), 2);
-outputprice = data(1:end, 3).*3.93-0.007;
+outputprice = data(1:end, 3).*2.1;
 
 x = linspace(1, size(trueprice, 1), size(trueprice, 1));
 

@@ -21,6 +21,7 @@ public:
     
     virtual void forwardpass(const std::vector<double>&) = 0;
     virtual void backwardpass() = 0;
+    virtual void applyWeightChanges() = 0;
     
     virtual void flushState() = 0;
     virtual void printUnit() = 0;

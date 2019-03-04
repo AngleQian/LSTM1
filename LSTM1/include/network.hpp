@@ -21,6 +21,7 @@ public:
     std::vector<double> forwardpass(const std::vector<double>&);
     double backwardpass(const std::vector<double>&, const std::vector<double>&);
     std::vector<double> validate();
+    void applyWeightChanges();
     
     void flushState();
     void printNetwork();

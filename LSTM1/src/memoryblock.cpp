@@ -17,6 +17,15 @@ MemoryBlock::MemoryBlock(int cellsPerBlock, double alpha, long noOfSourceUnits) 
     inputGateWeights = std::make_shared<std::vector<double>>();
     forgetGateWeights = std::make_shared<std::vector<double>>();
     outputGateWeights = std::make_shared<std::vector<double>>();
+    pendingInputGateWeights = std::make_shared<std::vector<double>>();
+    pendingForgetGateWeights = std::make_shared<std::vector<double>>();
+    pendingOutputGateWeights = std::make_shared<std::vector<double>>();
+    
+    for(int i = 0; i != noOfSourceUnits; ++i) {
+        pendingInputGateWeights->push_back(0);
+        pendingForgetGateWeights->push_back(0);
+        pendingOutputGateWeights->push_back(0);
+    }
 }
 
 void MemoryBlock::forwardpass(const std::vector<double> & inputs){
@@ -51,7 +60,7 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
     for(int i = 0; i != outputGateWeights->size(); ++i){
         deltaOutputWeight = alpha * delta * prevLayer->getOutput()->at(i);
 //      std::cout << "dOW: " << deltaOutputWeight << std::endl;
-        outputGateWeights->at(i) += utility::clipping(deltaOutputWeight);
+        pendingOutputGateWeights->at(i) = outputGateWeights->at(i) + utility::clipping(deltaOutputWeight);
 //       file << deltaOutputWeight << "\n";
     }
     
@@ -65,10 +74,10 @@ void MemoryBlock::backwardpass(const std::shared_ptr<Layer> prevLayer, const std
         calcInternalErrorGatePartials(&internalErrorInputPartial, &internalErrorForgetPartial, prevLayer, nextLayer, this, blockPosition, i);
         deltaInputWeight = alpha * internalErrorInputPartial;
 //        std::cout << "dIW: " << deltaInputWeight << std::endl;
-        inputGateWeights->at(i) += utility::clipping(deltaInputWeight);
+        pendingInputGateWeights->at(i) = inputGateWeights->at(i) + utility::clipping(deltaInputWeight);
         deltaForgetWeight = alpha * internalErrorForgetPartial;
 //        std::cout << "dFW: " << deltaForgetWeight << std::endl;
-        forgetGateWeights->at(i) += utility::clipping(deltaForgetWeight);
+        pendingForgetGateWeights->at(i) = forgetGateWeights->at(i) + utility::clipping(deltaForgetWeight);
     }
     
     long cellPosition;
@@ -104,6 +113,18 @@ void MemoryBlock::calcInternalErrorGatePartials(double* internalErrorInputPartia
         memoryCells[i]->calcInternalErrorGatePartials(&iEIPtemp, &iEFPtemp, prevLayer, nextLayer, memoryBlock, cellPosition, sourceUnitIndex);
         *internalErrorInputPartial += iEIPtemp;
         *internalErrorForgetPartial += iEFPtemp;
+    }
+}
+
+void MemoryBlock::applyWeightChanges() {
+    for(int i = 0; i != inputGateWeights->size(); ++i) {
+        inputGateWeights->at(i) = pendingInputGateWeights->at(i);
+        forgetGateWeights->at(i) = pendingForgetGateWeights->at(i);
+        outputGateWeights->at(i) = pendingOutputGateWeights->at(i);
+    }
+    
+    for(std::shared_ptr<MemoryCell> memoryCell : memoryCells) {
+        memoryCell->applyWeightChanges();
     }
 }
 

@@ -69,6 +69,12 @@ void Layer::backwardpass(const std::shared_ptr<Layer> prevLayer, const std::shar
     }
 }
 
+void Layer::applyWeightChanges() {
+    for(std::shared_ptr<Unit> unit : units) {
+        unit->applyWeightChanges();
+    }
+}
+
 void Layer::flushState(){
     for(int i = 0; i != units.size(); ++i){
         units[i]->flushState();

@@ -12,6 +12,7 @@
 
 MemoryCell::MemoryCell(double alpha, long noOfSourceUnits) : alpha(alpha) {
     cellStateWeights = std::make_shared<std::vector<double>>();
+    pendingCellStateWeights = std::make_shared<std::vector<double>>();
     cellStatePast = 0;
     
     internalErrorInputPartialPast = std::vector<double>();
@@ -22,7 +23,10 @@ MemoryCell::MemoryCell(double alpha, long noOfSourceUnits) : alpha(alpha) {
         internalErrorInputPartialPast.push_back(0);
         internalErrorForgetPartialPast.push_back(0);
         internalErrorCellStatePartialPast.push_back(0);
+        
+        pendingCellStateWeights->push_back(0);
     }
+    
 }
 
 void MemoryCell::forwardpass(const std::vector<double> & inputs, double inputGate, double forgetGate, double outputGate){
@@ -47,10 +51,8 @@ void MemoryCell::backwardpass(const std::shared_ptr<Layer> prevLayer, MemoryBloc
         internalErrorCellStatePartialPast[i] = internalErrorCellStatePartial;
         
         deltaCellStateWeight = alpha * internalErrorCellStatePartial;
-        cellStateWeights->at(i) += utility::clipping(deltaCellStateWeight);
+        pendingCellStateWeights->at(i) = cellStateWeights->at(i) + utility::clipping(deltaCellStateWeight);
     }
-    
-    cellStatePast = cellStateCurrent;
 }
 
 void MemoryCell::calcDelta(const std::shared_ptr<Layer> nextLayer, long cellPosition){
@@ -58,9 +60,8 @@ void MemoryCell::calcDelta(const std::shared_ptr<Layer> nextLayer, long cellPosi
     std::shared_ptr< std::vector< std::shared_ptr<Unit> > > units = nextLayer->getUnits();
     for(int i = 0; i != units->size(); ++i){
         std::shared_ptr<Unit> unit = units->at(i);
-        delta += unit->getDelta() * unit->getOutputWeightToCellInPrevLayer(cellPosition);
+        delta += utility::h(cellStateCurrent) * unit->getDelta() * unit->getOutputWeightToCellInPrevLayer(cellPosition);
     }
-    delta *= utility::h(cellStateCurrent);
 }
 
 void MemoryCell::calcInternalErrorGatePartials(double* internalErrorInputPartial, double* internalErrorForgetPartial, const std::shared_ptr<Layer> prevLayer, const std::shared_ptr<Layer> nextLayer, MemoryBlock* memoryBlock, long cellPosition, int sourceUnitIndex){
@@ -79,9 +80,16 @@ void MemoryCell::calcInternalError(const std::shared_ptr<Layer> nextLayer, Memor
     std::vector<std::shared_ptr<Unit>> nextLayerUnits = *nextLayer->getUnits();
     
     for(std::shared_ptr<Unit> unit : nextLayerUnits){
-        internalError += unit->getDelta() * unit->getOutputWeightToCellInPrevLayer(cellPosition);
+        internalError += factor * unit->getDelta() * unit->getOutputWeightToCellInPrevLayer(cellPosition);
     }
-    internalError *= factor;
+}
+
+void MemoryCell::applyWeightChanges() {
+    cellStatePast = cellStateCurrent;
+    
+    for(int i = 0; i != cellStateWeights->size(); ++i) {
+        cellStateWeights->at(i) = pendingCellStateWeights->at(i);
+    }
 }
 
 void MemoryCell::flushState(){

@@ -22,16 +22,19 @@ public:
     void backwardpass() {}
     void backwardpass(const std::shared_ptr<Layer>, double);
     void calcDelta(double);
+    void applyWeightChanges();
     
     void flushState();
     void printUnit();
     
     std::shared_ptr<std::vector<double>> getWeights() { return weights; }
+    std::shared_ptr<std::vector<double>> getPendingWeights() { return pendingWeights; }
     std::shared_ptr<std::vector<double>> getOutput() const;
     double getDelta() { return delta; }
     double getOutputWeightToCellInPrevLayer(long);
 private:
     double alpha;
+    std::shared_ptr<std::vector<double>> pendingWeights;
     std::shared_ptr<std::vector<double>> weights;
     
     double net;
